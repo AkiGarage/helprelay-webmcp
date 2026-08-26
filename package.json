@@ -1,0 +1,15 @@
+{
+  "name": "helprelay-webmcp",
+  "version": "0.1.0",
+  "private": true,
+  "description": "A dependency-free HelpRelay WebMCP Challenge prototype.",
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "check": "node scripts/check.mjs",
+    "test": "node --test",
+    "serve": "node scripts/serve.mjs"
+  }
+}

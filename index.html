@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#0b1220">
+    <meta name="description" content="HelpRelay is a safe WebMCP collaboration between a person, a browser agent, and a trusted helper.">
+    <title>HelpRelay — safe browser-agent collaboration</title>
+    <link rel="stylesheet" href="./styles.css">
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="shell header-inner">
+        <a class="wordmark" href="#main-content" aria-label="HelpRelay home">HelpRelay</a>
+        <span class="header-note">A calm path when a browser moment feels risky</span>
+      </div>
+    </header>
+
+    <main id="main-content" class="shell" tabindex="-1">
+      <section class="hero" aria-labelledby="hero-title">
+        <p class="eyebrow">WebMCP Challenge · safety-first demo</p>
+        <h1 id="hero-title">Pause. Understand. Choose one safe next step.</h1>
+        <p class="hero-copy">
+          HelpRelay helps a person and a browser agent work together without guessing. If the moment is still confusing, a trusted helper receives a clear draft — never an automatic message.
+        </p>
+        <div class="hero-actions">
+          <button id="run-story" class="button button-primary" type="button">Run the 15-second story</button>
+          <span id="webmcp-status" class="connection-status" role="status">Checking WebMCP availability…</span>
+        </div>
+      </section>
+
+      <section class="comparison" aria-labelledby="comparison-title">
+        <div class="section-heading">
+          <p class="eyebrow">The choice that matters</p>
+          <h2 id="comparison-title">Unsafe guessing vs. a policy-blocked path</h2>
+        </div>
+        <div class="comparison-grid">
+          <article class="choice-card choice-card-danger">
+            <div class="choice-topline"><span class="status-dot danger"></span><span class="tag tag-danger">Unsafe guess</span></div>
+            <h3>“Click the urgent link”</h3>
+            <p>A scary page can sound convincing. HelpRelay treats that wording as untrusted and refuses to open it.</p>
+            <p class="choice-result">Blocked before any external effect</p>
+          </article>
+          <article class="choice-card choice-card-safe">
+            <div class="choice-topline"><span class="status-dot safe"></span><span class="tag tag-safe">WebMCP path</span></div>
+            <h3>“Review visible context”</h3>
+            <p>The person sees one clear, reversible option. Nothing opens, changes, sends, or asks for credentials.</p>
+            <p class="choice-result">One allowlisted view-only step</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="story-panel" aria-labelledby="story-title">
+        <div class="section-heading">
+          <p class="eyebrow">See the boundary in action</p>
+          <h2 id="story-title">A synthetic 15-second browser story</h2>
+          <p>All story data is fictional and stays in this page. Watch each decision appear below.</p>
+        </div>
+        <ol id="story-steps" class="story-steps" aria-label="Demo story steps">
+          <li data-step="understand" data-state="pending"><span class="step-marker">1</span><span><strong>Understand</strong><small>Hear what feels wrong</small></span><span class="step-state">Waiting</span></li>
+          <li data-step="evidence" data-state="pending"><span class="step-marker">2</span><span><strong>Collect</strong><small>Keep page text untrusted</small></span><span class="step-state">Waiting</span></li>
+          <li data-step="blocked" data-state="pending"><span class="step-marker">3</span><span><strong>Block</strong><small>Refuse the suspicious action</small></span><span class="step-state">Waiting</span></li>
+          <li data-step="safe" data-state="pending"><span class="step-marker">4</span><span><strong>Offer</strong><small>One view-only step</small></span><span class="step-state">Waiting</span></li>
+          <li data-step="brief" data-state="pending"><span class="step-marker">5</span><span><strong>Prepare</strong><small>Separate the trusted brief</small></span><span class="step-state">Waiting</span></li>
+          <li data-step="handoff" data-state="pending"><span class="step-marker">6</span><span><strong>Confirm</strong><small>Draft only, never sent</small></span><span class="step-state">Waiting</span></li>
+        </ol>
+        <div id="story-status" class="story-status" role="status" aria-live="polite">Ready when you are. The story has no external side effects.</div>
+        <pre id="event-log" class="event-log" aria-label="Demo event log" hidden></pre>
+        <section id="handoff-preview" class="handoff-preview" aria-labelledby="handoff-preview-title" hidden>
+          <p class="eyebrow">Human review required</p>
+          <h3 id="handoff-preview-title">Review the exact local draft</h3>
+          <p class="handoff-copy">The story pauses here. Confirming creates a one-time local receipt and prepares a draft only. It does not send a message or contact anyone.</p>
+          <div class="preview-grid">
+            <div>
+              <h4>Destination</h4>
+              <pre id="handoff-destination" class="preview-value"></pre>
+            </div>
+            <div>
+              <h4>Brief payload</h4>
+              <pre id="handoff-payload" class="preview-value"></pre>
+            </div>
+          </div>
+          <button id="confirm-handoff" class="button button-secondary" type="button" disabled>Confirm this local draft</button>
+        </section>
+      </section>
+
+      <section class="rehearsal" aria-labelledby="rehearsal-title">
+        <div class="section-heading">
+          <p class="eyebrow">Try the human side</p>
+          <h2 id="rehearsal-title">Start with one sentence</h2>
+          <p>Describe what you saw. HelpRelay will only restate it and keep the next decision visible.</p>
+        </div>
+        <form id="problem-form" class="problem-form">
+          <label for="problem-input">What happened?</label>
+          <textarea id="problem-input" name="problem" rows="3" maxlength="1200" placeholder="For example: A page showed a scary message and I am not sure what to do."></textarea>
+          <button class="button button-secondary" type="submit">Understand this problem</button>
+        </form>
+        <div id="human-status" class="human-status" role="status" aria-live="polite">No action taken yet.</div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="shell footer-inner">
+        <p><strong>HelpRelay</strong> is a static, local-first competition prototype.</p>
+        <p>Guidance is bounded and safety-checked, not guaranteed safe. External effects always require a separate human decision.</p>
+      </div>
+    </footer>
+    <script type="module" src="./src/app.js"></script>
+  </body>
+</html>
