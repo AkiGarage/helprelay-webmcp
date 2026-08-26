@@ -14,13 +14,13 @@ Many people do not need a more powerful agent; they need an agent that makes unc
 
 ## What we built
 
-HelpRelay is a static, dependency-free WebMCP prototype with exactly five tools: understand the problem, collect visible evidence, propose one safe step, prepare a separated trusted brief, and request a draft-only handoff. The human interface is the primary product surface, while WebMCP exposes the same deterministic domain handlers to an agent.
+HelpRelay is a static, dependency-free WebMCP prototype with exactly five tools: understand the problem, collect visible evidence, propose one safe step, prepare a separated trusted brief, and request a draft-only handoff. The human interface is the primary product surface, and its live story calls the exact registered WebMCP executors used by an agent, visibly labelling that path.
 
 The synthetic story uses a fictional urgent banner containing prompt-injection language and a suspicious invalid link. HelpRelay records it as untrusted, blocks the unsafe guess, offers one view-only/reversible review, and prepares a brief with facts, interpretations, uncertainty, and attempts. The story then pauses on the exact destination and payload preview; a separate human action represented by a one-time local receipt is required to prepare the draft, which still never sends.
 
 ## How WebMCP is used
 
-The app statically calls `document.modelContext.registerTool` for the five imperative tools. Each definition has a concise description, closed input schema, annotations, and an execute function that forwards the browser-provided `AbortController` signal. A separate policy validates the envelope and action before the shared handler can mutate local state. Results are checked for a serializable text content block and structured content.
+The app statically calls `document.modelContext.registerTool` for the five imperative tools and awaits each registration result. Each definition has a concise description, closed input schema, annotations, and an execute function that forwards the browser-provided `AbortController` signal. A separate policy validates the envelope and action before the shared handler can mutate local state. Results are checked for a serializable text content block and structured content; partial registration deactivates every residual executor.
 
 ## Safety and privacy
 

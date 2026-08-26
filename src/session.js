@@ -28,6 +28,7 @@ export function createSession({ sessionId = makeSessionId(), problem = "" } = {}
     revision: 1,
     problem: clip(problem, 1200),
     evidence: [],
+    evidenceVersion: 0,
     evidenceDigest: digestEvidence([]),
     attempts: [],
     safeStepCount: 0,
@@ -47,6 +48,7 @@ export function sessionEnvelope(session) {
   return {
     sessionId: session.sessionId,
     revision: session.revision,
+    evidenceVersion: session.evidenceVersion,
     evidenceDigest: session.evidenceDigest,
   };
 }
@@ -64,6 +66,8 @@ export function setProblem(session, userStatement) {
   const text = clip(userStatement, 1200);
   session.problem = text;
   session.status = "problem-understood";
+  session.humanConfirmation = null;
+  session.handoff = null;
   incrementRevision(session);
   return text;
 }
@@ -89,8 +93,11 @@ function normalizeEvidence(item, index) {
 export function appendEvidence(session, item) {
   const evidence = normalizeEvidence(item, session.evidence.length);
   session.evidence.push(evidence);
+  session.evidenceVersion += 1;
   session.evidenceDigest = digestEvidence(session.evidence);
   session.status = "evidence-captured";
+  session.humanConfirmation = null;
+  session.handoff = null;
   incrementRevision(session);
   return evidence;
 }
@@ -105,6 +112,8 @@ export function recordSafeStep(session, step) {
   };
   session.attempts.push("One view-only review step was proposed; it was not opened automatically.");
   session.status = "safe-step-proposed";
+  session.humanConfirmation = null;
+  session.handoff = null;
   incrementRevision(session);
 }
 
@@ -163,7 +172,12 @@ export function storeBrief(session, payload, helperLabel = "trusted helper") {
     helperLabel: clip(helperLabel, 120) || "trusted helper",
     payload: boundedPayload,
     payloadDigest: digestPayload(boundedPayload),
+    evidenceVersion: session.evidenceVersion,
+    evidenceDigest: session.evidenceDigest,
+    revision: session.revision + 1,
   };
+  session.humanConfirmation = null;
+  session.handoff = null;
   session.status = "brief-prepared";
   incrementRevision(session);
   return session.brief;
@@ -172,12 +186,21 @@ export function storeBrief(session, payload, helperLabel = "trusted helper") {
 /** Record a human UI confirmation as a one-time local receipt. */
 export function recordHumanConfirmation(session, destination, payload) {
   if (session.humanConfirmation || session.handoff) return null;
+  if (
+    !session.brief
+    || session.brief.revision !== session.revision
+    || session.brief.evidenceVersion !== session.evidenceVersion
+    || session.brief.evidenceDigest !== session.evidenceDigest
+  ) return null;
   session.humanConfirmation = {
     action: "request_handoff",
     confirmed: true,
     source: "human-ui",
     destinationDigest: stableDigest(destination),
     payloadDigest: digestPayload(payload),
+    evidenceVersion: session.evidenceVersion,
+    evidenceDigest: session.evidenceDigest,
+    revision: session.revision + 1,
     destination: JSON.parse(canonicalize(destination)),
     payload: JSON.parse(canonicalize(payload)),
   };
@@ -200,6 +223,7 @@ export function handoffStateSnapshot(session) {
   return {
     problem: session.problem,
     evidence: session.evidence,
+    evidenceVersion: session.evidenceVersion,
     evidenceDigest: session.evidenceDigest,
     attempts: session.attempts,
     safeStepCount: session.safeStepCount,
@@ -213,6 +237,7 @@ export function storeHandoff(session, input, result) {
   session.handoff = {
     fingerprint: handoffFingerprint(input),
     revisionAtPreparation: session.revision,
+    evidenceVersion: session.evidenceVersion,
     evidenceDigest: session.evidenceDigest,
     state,
     stateDigest: stableDigest(state),

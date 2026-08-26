@@ -6,8 +6,6 @@ import { createSession, sessionEnvelope } from "./session.js";
 import { confirmHandoff, createDomainHandlers } from "./tools.js";
 import { registerWebMcpTools } from "./webmcp.js";
 
-const STORY_SESSION_ID = "demo-story-session";
-
 function sleep(milliseconds) {
   return new Promise((resolve) => setTimeout(resolve, milliseconds));
 }
@@ -57,11 +55,11 @@ function statusForResult(result) {
   return result?.structuredContent?.status ?? "unknown";
 }
 
-export function boot(documentRef = globalThis.document) {
+export async function boot(documentRef = globalThis.document) {
   if (!documentRef || typeof documentRef.querySelector !== "function") return null;
 
-  const handlers = createDomainHandlers(createSession({ sessionId: STORY_SESSION_ID }));
-  const registration = registerWebMcpTools({ documentRef, handlers });
+  const handlers = createDomainHandlers(createSession());
+  const registration = await registerWebMcpTools({ documentRef, handlers });
   const webmcpStatus = documentRef.querySelector("#webmcp-status");
   if (webmcpStatus) {
     webmcpStatus.textContent = registration.registered
@@ -81,8 +79,11 @@ export function boot(documentRef = globalThis.document) {
   let pendingHandoff = null;
 
   async function invoke(toolName, extra, label = toolName) {
-    const result = await handlers.run(toolName, { ...sessionEnvelope(handlers.session), ...extra }, {});
-    appendLog(documentRef, label, result);
+    const input = { ...sessionEnvelope(handlers.session), ...extra };
+    const result = registration.registered
+      ? await registration.run(toolName, input, {})
+      : await handlers.run(toolName, input, {});
+    appendLog(documentRef, registration.registered ? `WebMCP tool · ${label}` : label, result);
     return result;
   }
 
@@ -98,7 +99,7 @@ export function boot(documentRef = globalThis.document) {
     if (handoffDestination) handoffDestination.textContent = "";
     if (handoffPayload) handoffPayload.textContent = "";
     if (confirmButton) confirmButton.disabled = true;
-    const fresh = createSession({ sessionId: STORY_SESSION_ID });
+    const fresh = createSession();
     replaceSessionContents(handlers.session, fresh);
     const log = documentRef.querySelector("#event-log");
     if (log) {
@@ -241,8 +242,8 @@ export function boot(documentRef = globalThis.document) {
 
 if (typeof document !== "undefined") {
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", () => boot(document), { once: true });
+    document.addEventListener("DOMContentLoaded", () => { void boot(document); }, { once: true });
   } else {
-    boot(document);
+    void boot(document);
   }
 }

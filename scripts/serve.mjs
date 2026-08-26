@@ -37,6 +37,7 @@ export function resolvePublicFile(urlPath, rootDir = ROOT_DIR) {
     if (!inside(root, candidate)) return null;
     if (!PUBLIC_FILES.has(relativePath.replaceAll("\\", "/"))) return null;
     const realCandidate = realpathSync(candidate);
+    if (realCandidate !== candidate) return null;
     if (!inside(root, realCandidate) || !statSync(realCandidate).isFile()) return null;
     return realCandidate;
   } catch {

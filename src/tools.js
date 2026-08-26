@@ -37,6 +37,7 @@ function contextResult(session, details = {}) {
   return {
     sessionId: session.sessionId,
     revision: session.revision,
+    evidenceVersion: session.evidenceVersion,
     evidenceDigest: session.evidenceDigest,
     ...details,
   };
@@ -46,6 +47,9 @@ function makeBlocked(policy) {
   return failResult(policy.code, policy.message, {
     ...(policy.riskSignals ? { riskSignals: policy.riskSignals } : {}),
     ...(policy.expectedRevision !== undefined ? { expectedRevision: policy.expectedRevision } : {}),
+    ...(policy.expectedEvidenceVersion !== undefined
+      ? { expectedEvidenceVersion: policy.expectedEvidenceVersion }
+      : {}),
     ...(policy.expectedEvidenceDigest !== undefined
       ? { expectedEvidenceDigest: policy.expectedEvidenceDigest }
       : {}),
@@ -215,8 +219,8 @@ export function confirmHandoff(handlers, destination = {
   if (!handlers?.session?.brief || handlers.session.handoff || handlers.session.humanConfirmation) return null;
   const payload = handlers.session.brief.payload;
   const confirmation = buildHandoffConfirmation(destination, payload);
-  recordHumanConfirmation(handlers.session, destination, payload);
-  return confirmation;
+  const recorded = recordHumanConfirmation(handlers.session, destination, payload);
+  return recorded ? confirmation : null;
 }
 
 export { SAFE_STEP };

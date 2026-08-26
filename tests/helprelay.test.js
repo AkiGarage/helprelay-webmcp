@@ -28,7 +28,7 @@ function assertStatus(result, status) {
   assert.equal(result?.structuredContent?.status, status, result?.content?.[0]?.text);
 }
 
-function makeFakeDocument() {
+function makeFakeDocument({ withWebMcp = false } = {}) {
   const nodes = new Map();
   const makeNode = (extra = {}) => ({
     textContent: "",
@@ -65,14 +65,29 @@ function makeFakeDocument() {
   ]) {
     nodes.set(selector, node);
   }
-  return {
+  const documentRef = {
     querySelector(selector) {
       const stepMatch = /^\[data-step="([^"]+)"\]$/.exec(selector);
       return stepMatch ? stepNodes.get(stepMatch[1]) ?? null : nodes.get(selector) ?? null;
     },
     nodes,
     stepNodes,
+    registeredTools: [],
+    executedToolNames: [],
   };
+  if (withWebMcp) {
+    documentRef.modelContext = {
+      async registerTool(definition) {
+        const execute = definition.execute;
+        definition.execute = async (...args) => {
+          documentRef.executedToolNames.push(definition.name);
+          return execute(...args);
+        };
+        documentRef.registeredTools.push(definition);
+      },
+    };
+  }
+  return documentRef;
 }
 
 async function waitFor(predicate, timeout = 500) {
@@ -128,7 +143,7 @@ async function reachBrief() {
   return { handlers, brief: handlers.session.brief };
 }
 
-test("registers exactly the five WebMCP tools with the current registration seam", () => {
+test("registers exactly the five WebMCP tools with the current registration seam", async () => {
   const registered = [];
   const options = [];
   const documentRef = {
@@ -139,7 +154,7 @@ test("registers exactly the five WebMCP tools with the current registration seam
       },
     },
   };
-  const outcome = registerWebMcpTools({ documentRef, handlers: createDomainHandlers(createSession({ sessionId: "registered" })) });
+  const outcome = await registerWebMcpTools({ documentRef, handlers: createDomainHandlers(createSession({ sessionId: "registered" })) });
   assert.equal(outcome.registered, true);
   assert.deepEqual(registered.map((definition) => definition.name), TOOL_NAMES);
   assert.deepEqual(TOOL_DEFINITIONS.map((definition) => definition.name), TOOL_NAMES);
@@ -153,6 +168,37 @@ test("registers exactly the five WebMCP tools with the current registration seam
     assert.equal(definition.annotations.readOnlyHint, true);
     assert.equal(definition.annotations.untrustedContentHint, true);
   }
+});
+
+test("registered WebMCP results expose the complete envelope for the next typed call", async () => {
+  const registered = [];
+  const session = createSession({ sessionId: "result-envelope" });
+  await registerWebMcpTools({
+    documentRef: { modelContext: { registerTool: (definition) => registered.push(definition) } },
+    handlers: createDomainHandlers(session),
+  });
+  const understand = registered.find((tool) => tool.name === "understand_problem");
+  const collect = registered.find((tool) => tool.name === "collect_evidence");
+  const understood = await understand.execute({
+    ...sessionEnvelope(session),
+    userStatement: "A warning page is hard to explain.",
+  });
+  assertStatus(understood, "problem-understood");
+  const { sessionId, revision, evidenceVersion, evidenceDigest } = understood.structuredContent;
+  assert.equal(evidenceVersion, 0);
+  const collected = await collect.execute({
+    sessionId,
+    revision,
+    evidenceVersion,
+    evidenceDigest,
+    source: "browser-visible",
+    pageTitle: "Warning page",
+    visibleText: "An urgent message is visible, but nothing was opened.",
+  });
+  assertStatus(collected, "evidence-captured");
+  assert.equal(collected.structuredContent.evidenceVersion, 1);
+  assert.equal(collected.structuredContent.revision, session.revision);
+  assert.equal(collected.structuredContent.evidenceDigest, session.evidenceDigest);
 });
 
 test("full synthetic flow blocks the guess, offers one safe step, prepares a separated brief, and drafts handoff", async () => {
@@ -413,9 +459,74 @@ test("human confirmation compares canonical destination, not only the 32-bit dig
   assert.equal(blocked.structuredContent.code, "confirmation-mismatch");
 });
 
+test("evidence generation rejects a stale envelope even when legacy evidence digests collide", () => {
+  const evidenceA = [{
+    id: "evidence-01",
+    source: "browser-visible",
+    pageTitle: "Page",
+    visibleText: "Visible rxjp46tw",
+    observations: [],
+    links: [],
+  }];
+  const evidenceB = [{
+    id: "evidence-01",
+    source: "browser-visible",
+    pageTitle: "Page",
+    visibleText: "Visible rrhw0ai0",
+    observations: [],
+    links: [],
+  }];
+  assert.notDeepEqual(evidenceA, evidenceB);
+  assert.equal(stableDigest(evidenceA), stableDigest(evidenceB), "regression pair must collide under legacy digest");
+
+  const session = createSession({ sessionId: "evidence-collision" });
+  session.evidence = evidenceB;
+  session.evidenceDigest = stableDigest(evidenceB);
+  session.evidenceVersion = 2;
+  session.revision = 3;
+  const evaluation = evaluateRequest({
+    toolName: "propose_safe_step",
+    session,
+    input: {
+      sessionId: session.sessionId,
+      revision: session.revision,
+      evidenceVersion: 1,
+      evidenceDigest: stableDigest(evidenceA),
+      stepId: "review_visible_context",
+      target: "current-context",
+    },
+  });
+  assert.equal(evaluation.ok, false);
+  assert.equal(evaluation.code, "evidence-version-stale");
+});
+
+test("evidence changes invalidate an already issued human handoff confirmation", async () => {
+  const { handlers, brief } = await reachBrief();
+  const destination = { label: "A trusted helper", channel: ALLOWED_HANDOFF_CHANNEL };
+  const confirmation = confirmHandoff(handlers, destination);
+  assert.ok(confirmation);
+  assertStatus(
+    await handlers.run(
+      "collect_evidence",
+      request(handlers, {
+        source: "browser-visible",
+        pageTitle: "Later visible state",
+        visibleText: "The evidence changed after the person reviewed the handoff.",
+      }),
+    ),
+    "evidence-captured",
+  );
+  const result = await handlers.run("request_handoff", {
+    ...request(handlers, { destination, payload: brief.payload }),
+    confirmation,
+  });
+  assertStatus(result, "blocked");
+  assert.equal(result.structuredContent.code, "brief-stale");
+});
+
 test("WebMCP execute forwards an AbortController signal and returns serializable results", async () => {
   const registered = [];
-  registerWebMcpTools({
+  await registerWebMcpTools({
     documentRef: { modelContext: { registerTool: (definition) => registered.push(definition) } },
     handlers: createDomainHandlers(createSession({ sessionId: "abort" })),
   });
@@ -425,6 +536,7 @@ test("WebMCP execute forwards an AbortController signal and returns serializable
     {
       sessionId: "abort",
       revision: 1,
+      evidenceVersion: 0,
       evidenceDigest: "d00000000",
       userStatement: "No mutation",
     },
@@ -435,7 +547,7 @@ test("WebMCP execute forwards an AbortController signal and returns serializable
   assert.doesNotThrow(() => JSON.stringify(result));
 });
 
-test("partial WebMCP registration aborts one shared signal and unregisters every partial tool", () => {
+test("partial WebMCP registration aborts one shared signal and unregisters every partial tool", async () => {
   const registered = [];
   const unregistered = [];
   const options = [];
@@ -451,20 +563,44 @@ test("partial WebMCP registration aborts one shared signal and unregisters every
       },
     },
   };
-  const outcome = registerWebMcpTools({ documentRef, handlers: createDomainHandlers(createSession({ sessionId: "partial" })) });
+  const outcome = await registerWebMcpTools({ documentRef, handlers: createDomainHandlers(createSession({ sessionId: "partial" })) });
   assert.equal(outcome.registered, false);
   assert.deepEqual(outcome.names, []);
-  assert.deepEqual(outcome.partialNames, ["understand_problem", "collect_evidence"]);
-  assert.deepEqual(unregistered, ["collect_evidence", "understand_problem"]);
+  assert.deepEqual(outcome.partialNames, ["understand_problem", "collect_evidence", "propose_safe_step"]);
+  assert.deepEqual(unregistered, ["propose_safe_step", "collect_evidence", "understand_problem"]);
   assert.equal(outcome.rollbackAttempted, true);
   assert.equal(outcome.rollbackComplete, true);
   assert.equal(new Set(options.map((entry) => entry.signal)).size, 1);
   assert.equal(options[0].signal.aborted, true);
 });
 
+test("rejected async registration deactivates residual tools when cleanup is unavailable", async () => {
+  const registered = [];
+  const documentRef = {
+    modelContext: {
+      async registerTool(definition) {
+        registered.push(definition);
+        if (registered.length === 3) throw new Error("synthetic async registration rejection after registration");
+      },
+    },
+  };
+  const outcome = await registerWebMcpTools({
+    documentRef,
+    handlers: createDomainHandlers(createSession({ sessionId: "async-partial" })),
+  });
+  assert.equal(outcome.registered, false);
+  assert.deepEqual(outcome.names, []);
+  assert.deepEqual(outcome.partialNames, ["understand_problem", "collect_evidence", "propose_safe_step"]);
+  assert.equal(outcome.rollbackComplete, false);
+  assert.match(outcome.reason, /deactivated/);
+  const residualCall = await registered[0].execute({}, {});
+  assertStatus(residualCall, "blocked");
+  assert.equal(residualCall.structuredContent.code, "registration-incomplete");
+});
+
 test("WebMCP adapter turns handler throws into a generic serializable blocked result", async () => {
   const registered = [];
-  registerWebMcpTools({
+  await registerWebMcpTools({
     documentRef: { modelContext: { registerTool: (definition) => registered.push(definition) } },
     handlers: { run() { throw new Error("secret implementation detail"); } },
   });
@@ -536,13 +672,16 @@ test("forbidden-operation matrix stays blocked before any local action", async (
 });
 
 test("the story pauses at the exact preview until a separate button click", async () => {
-  const documentRef = makeFakeDocument();
-  const app = boot(documentRef);
+  const documentRef = makeFakeDocument({ withWebMcp: true });
+  const app = await boot(documentRef);
+  assert.equal(app.registration.registered, true);
+  assert.deepEqual(documentRef.registeredTools.map((tool) => tool.name), TOOL_NAMES);
   await app.runStory();
   const preview = documentRef.nodes.get("#handoff-preview");
   const confirmButton = documentRef.nodes.get("#confirm-handoff");
   const storyStatus = documentRef.nodes.get("#story-status");
   const eventLog = documentRef.nodes.get("#event-log");
+  const firstRunSessionId = app.handlers.session.sessionId;
   assert.equal(preview.hidden, false);
   assert.equal(confirmButton.disabled, false);
   assert.equal(app.handlers.session.handoff, null);
@@ -550,12 +689,25 @@ test("the story pauses at the exact preview until a separate button click", asyn
   assert.match(documentRef.nodes.get("#handoff-payload").textContent, /facts/);
   assert.match(storyStatus.textContent, /paused safely/);
   assert.equal(eventLog.textContent.includes("Confirmed draft"), false);
+  assert.deepEqual(documentRef.executedToolNames, [
+    "understand_problem",
+    "collect_evidence",
+    "propose_safe_step",
+    "propose_safe_step",
+    "prepare_trusted_brief",
+  ]);
+  assert.match(eventLog.textContent, /WebMCP tool/);
 
   confirmButton.listeners.get("click")();
   await waitFor(() => Boolean(app.handlers.session.handoff) && /Story complete/.test(storyStatus.textContent));
   assert.equal(confirmButton.disabled, true);
   assert.match(storyStatus.textContent, /Story complete/);
   assert.equal(eventLog.textContent.includes("Confirmed draft"), true);
+  assert.equal(documentRef.executedToolNames.at(-1), "request_handoff");
+
+  const secondRun = app.runStory();
+  assert.notEqual(app.handlers.session.sessionId, firstRunSessionId, "every story run needs a fresh session identity");
+  await secondRun;
 });
 
 test("static server exposes only real allowlisted files and rejects secrets and symlink escapes", async () => {
@@ -565,6 +717,7 @@ test("static server exposes only real allowlisted files and rejects secrets and 
   await mkdir(src);
   await writeFile(join(root, "index.html"), "safe index");
   await writeFile(join(root, ".env"), "SECRET=do-not-serve");
+  await symlink(".env", join(root, "styles.css"));
   const outsideFile = join(outsideRoot, "outside.js");
   await writeFile(outsideFile, "secret outside");
   await symlink(outsideFile, join(src, "app.js"));
@@ -572,7 +725,7 @@ test("static server exposes only real allowlisted files and rejects secrets and 
     const realIndex = await realpath(join(root, "index.html"));
     assert.equal(resolvePublicFile("/index.html", root), realIndex);
     assert.equal(resolvePublicFile("/", root), realIndex);
-    for (const path of ["/.env", "/.git/config", "/README.md", "/src/secret.js", "/../index.html", "/src/app.js"]) {
+    for (const path of ["/.env", "/.git/config", "/README.md", "/src/secret.js", "/../index.html", "/styles.css", "/src/app.js"]) {
       assert.equal(resolvePublicFile(path, root), null, path);
     }
 
@@ -589,8 +742,8 @@ test("static server exposes only real allowlisted files and rejects secrets and 
   }
 });
 
-test("policy remains closed when a browser registration surface is absent", () => {
-  const outcome = registerWebMcpTools({ documentRef: {}, handlers: createDomainHandlers() });
+test("policy remains closed when a browser registration surface is absent", async () => {
+  const outcome = await registerWebMcpTools({ documentRef: {}, handlers: createDomainHandlers() });
   assert.equal(outcome.registered, false);
   assert.deepEqual(outcome.names, []);
   const evaluation = evaluateRequest({ toolName: "not_a_tool", input: {}, session: createSession({ sessionId: "closed" }) });

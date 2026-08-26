@@ -5,13 +5,14 @@ HelpRelay is a safety-oriented prototype, not a safety guarantee. Its central se
 ## Enforcement
 
 - `src/policy.js` is independent from the prose-facing handlers. It validates a closed JSON input shape before any state mutation.
-- Every request must identify the current `sessionId`, integer `revision`, and exact `evidenceDigest`. Stale evidence, revisions, or sessions fail closed.
+- Every request must identify the current `sessionId`, integer `revision`, monotonic `evidenceVersion`, and exact `evidenceDigest`. The generation binding prevents a legacy 32-bit digest collision from reviving stale evidence. Stale evidence, revisions, or sessions fail closed.
 - Risk signals include prompt-injection wording, suspicious links, credential requests, urgency pressure, and external-action wording. Evidence can be recorded as untrusted context, but it cannot become an instruction.
 - The only proposed action is `review_visible_context`, a single view-only and reversible step with no URL or target. A session cannot receive a second safe step.
 - The policy rejects browser/device control, navigation, arbitrary links, credential entry, downloads, installation, purchases, payments, deletion, settings or permission changes, uploads, calls, and messages.
-- `request_handoff` creates a local draft only. It requires a payload that exactly matches the prepared brief, an allowlisted symbolic destination, and a one-time receipt minted by the separate human UI confirmation seam whose canonical destination and payload values (with digests as a compact supplement) match. A model cannot mint that receipt by adding `source: "human-ui"` to its own JSON. It never sends.
+- `request_handoff` creates a local draft only. It requires a payload that exactly matches a brief bound to the current evidence, an allowlisted symbolic destination, and a one-time receipt minted by the separate human UI confirmation seam. The receipt is bound to the current revision/evidence and retains canonical destination and payload values; compact digests are only a supplement. A model cannot mint that receipt by adding `source: "human-ui"` to its own JSON. It never sends.
 - Exact handoff replay is idempotent and returns `duplicate-prepared`; a changed or evidence-stale replay fails closed.
 - WebMCP results are passed through a serializability/output-shape guard. Unexpected handler errors become a generic blocked result.
+- Promise-returning registrations are awaited. If a browser rejects part of the five-tool registration, every residual executor is deactivated even when browser cleanup cannot be verified.
 
 ## Threat model limits
 

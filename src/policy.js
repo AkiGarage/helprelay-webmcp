@@ -140,6 +140,8 @@ function sameJson(left, right) {
 function isExactHandoffReplay(input, session) {
   if (!session.handoff || input.sessionId !== session.sessionId) return false;
   if (input.revision !== session.revision || input.revision !== session.handoff.revisionAtPreparation) return false;
+  if (session.handoff.evidenceVersion !== session.evidenceVersion) return false;
+  if (input.evidenceVersion !== session.handoff.evidenceVersion) return false;
   if (session.handoff.evidenceDigest !== session.evidenceDigest) return false;
   if (input.evidenceDigest !== session.handoff.evidenceDigest) return false;
   if (session.handoff.stateDigest !== stableDigest(handoffStateSnapshot(session))) return false;
@@ -194,6 +196,14 @@ function validateHandoff(input, session, riskSignals) {
   if (!sameJson(input.payload, session.brief.payload)) {
     return failure("payload-mismatch", "The handoff payload must exactly match the prepared brief.", { riskSignals });
   }
+  if (
+    session.brief.evidenceVersion !== session.evidenceVersion
+    || session.brief.evidenceDigest !== session.evidenceDigest
+  ) {
+    return failure("brief-stale", "The trusted brief is stale because the evidence changed; prepare it again.", {
+      riskSignals,
+    });
+  }
   if (!session.humanConfirmation) {
     return failure("handoff-confirmation-required", "A separate human UI confirmation receipt is required before preparing this draft.", {
       riskSignals,
@@ -206,6 +216,15 @@ function validateHandoff(input, session, riskSignals) {
   }
   if (input.confirmation.source !== "human-ui" || input.confirmation.action !== "request_handoff") {
     return failure("handoff-confirmation-required", "Only a human UI confirmation can approve this draft.", { riskSignals });
+  }
+  if (
+    session.humanConfirmation.revision !== session.revision
+    || session.humanConfirmation.evidenceVersion !== session.evidenceVersion
+    || session.humanConfirmation.evidenceDigest !== session.evidenceDigest
+  ) {
+    return failure("confirmation-stale", "The separate human confirmation is stale; review the current brief again.", {
+      riskSignals,
+    });
   }
   if (input.confirmation.destinationDigest !== stableDigest(input.destination)) {
     return failure("confirmation-mismatch", "The confirmed destination does not match the requested destination.", { riskSignals });
@@ -247,6 +266,12 @@ export function evaluateRequest({ toolName, input, session }) {
     return failure("revision-stale", "The request revision is stale; refresh the visible state and try again.", {
       riskSignals,
       expectedRevision: session.revision,
+    });
+  }
+  if (!duplicateReplay && input.evidenceVersion !== session.evidenceVersion) {
+    return failure("evidence-version-stale", "The evidence generation is stale; refresh the visible state and try again.", {
+      riskSignals,
+      expectedEvidenceVersion: session.evidenceVersion,
     });
   }
   if (!duplicateReplay && input.evidenceDigest !== session.evidenceDigest) {

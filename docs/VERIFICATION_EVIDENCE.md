@@ -9,8 +9,9 @@ Recorded on 2026-08-26 against the public competition repository and live GitHub
 - Initial application commit: `a6b9ac3eb7101e78b7048038a56e24d211f0d9bd`
 - GitHub Pages reported the deployment as `built` with HTTPS enforced.
 - Served `index.html` SHA-256: `5faaba4a2db29a9ed5380ae9576e06d3c06d3f2938400cbd5aa1b399b28f0b74`
-- Served `src/app.js` SHA-256: `40870fdcda5ad7b4c88e4a63fd8d3c702a8fc50cb41197b8247cf6f557549d75`
-- Both hashes matched the local application artifact exactly.
+- Served `src/app.js` SHA-256: `d2c8b4cdade0c371a72d80b01bda1df702f59ab573fb649c7c0e6da6456700de`
+- Public application manifest SHA-256: `55ac724ad8e740acd6f829985d2b819db6219c11511dc9fed3ae7fb471f00df5`
+- The served hashes matched the local application artifact exactly.
 
 ## Live WebMCP execution
 
@@ -40,6 +41,7 @@ This verifies real registration and execution in the recorded environment, not o
 
 - The page reported `WebMCP connected · 5 tools ready`.
 - The 15-second story paused on the exact destination and brief preview.
+- Its visible event log identified every domain call as `WebMCP tool`, and the story test executes those exact registered functions.
 - The confirmation button remained enabled only at that review point.
 - One separate click completed the local draft and disabled the receipt.
 - Final status: `Story complete · the trusted brief is ready for review, and nothing was sent.`
@@ -47,10 +49,11 @@ This verifies real registration and execution in the recorded environment, not o
 
 ## Local executable evidence
 
-- `npm test`: 17/17 pass.
+- `npm test`: 21/21 pass.
 - `npm run check`: syntax, required files, five definitions, registration seam, module entry, and no storage/network call in the HTML artifact.
 - Local HTTP smoke: `/` returned the expected artifact; `/.env` and `/.git/config` returned 404.
-- The server test also covers dotfiles, non-allowlisted files, and symlink escape denial.
+- Regression cases include known evidence and destination digest collisions, evidence changed after human confirmation, rejected asynchronous registration with residual executor deactivation, and allowlisted-name symlinks targeting an in-root secret.
+- The server test also covers dotfiles, non-allowlisted files, and internal/external symlink denial.
 
 ## Evidence limits
 

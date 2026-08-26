@@ -24,10 +24,11 @@ export const MAX_BRIEF_ITEMS = 20;
 const commonProperties = {
   sessionId: { type: "string", minLength: 1, maxLength: 120 },
   revision: { type: "integer", minimum: 1 },
+  evidenceVersion: { type: "integer", minimum: 0 },
   evidenceDigest: { type: "string", minLength: 1, maxLength: 32 },
 };
 
-const commonRequired = ["sessionId", "revision", "evidenceDigest"];
+const commonRequired = ["sessionId", "revision", "evidenceVersion", "evidenceDigest"];
 
 export const TOOL_SCHEMAS = Object.freeze({
   understand_problem: {
