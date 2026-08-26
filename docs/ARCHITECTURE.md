@@ -19,6 +19,8 @@ no-WebMCP local fallback ┘                              │
 - `src/app.js` renders the accessible human rehearsal and synthetic story. The live story calls the registered executors and visibly prefixes its log with `WebMCP tool`; the UI cannot bypass policy. The story pauses on the exact handoff preview, and only its explicit confirmation button can mint the one-time human receipt.
 - `scripts/serve.mjs` is an optional local-only static server using Node built-ins.
 
+All browser-side ES module imports use one explicit artifact query version. This keeps GitHub Pages/browser caches from combining tool schemas and handlers from different public revisions.
+
 ## State and revision model
 
 Each session has a random `sessionId`, monotonic `revision`, monotonic `evidenceVersion`, evidence array, and deterministic evidence digest. On a fresh page, one envelope-free `understand_problem` call bootstraps the session and returns its complete envelope; repeated bootstrap or a partial envelope is closed. A state-changing understanding, evidence capture, safe-step proposal, brief preparation, or human confirmation receipt increments the revision; evidence capture also increments its independent generation. The generation prevents a legacy digest collision from authorizing stale state. Handoff draft preparation is replay-safe and intentionally does not increment revision: repeating the exact request can return `duplicate-prepared` without creating a second side effect. Briefs and human receipts are bound to the evidence/revision that was reviewed. The human UI receipt is one-time and is consumed when the draft is prepared.

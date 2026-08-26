@@ -6,7 +6,7 @@ import {
   createTextResult,
   failResult,
   stableDigest,
-} from "./contracts.js";
+} from "./contracts.js?v=20260826b";
 import {
   appendEvidence,
   buildBriefPayload,
@@ -18,8 +18,8 @@ import {
   setProblem,
   storeBrief,
   storeHandoff,
-} from "./session.js";
-import { evaluateRequest } from "./policy.js";
+} from "./session.js?v=20260826b";
+import { evaluateRequest } from "./policy.js?v=20260826b";
 
 const SAFE_STEP = Object.freeze({
   id: VIEW_ONLY_STEP_ID,

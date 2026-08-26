@@ -8,9 +8,9 @@ Recorded on 2026-08-26 against the public competition repository and live GitHub
 - Live URL: https://akigarage.github.io/helprelay-webmcp/
 - Initial application commit: `a6b9ac3eb7101e78b7048038a56e24d211f0d9bd`
 - GitHub Pages reported the deployment as `built` with HTTPS enforced.
-- Served `index.html` SHA-256: `5faaba4a2db29a9ed5380ae9576e06d3c06d3f2938400cbd5aa1b399b28f0b74`
-- Served `src/app.js` SHA-256: `d2c8b4cdade0c371a72d80b01bda1df702f59ab573fb649c7c0e6da6456700de`
-- Public application manifest SHA-256: `f79417eee091c437f9d0f7210a4f8a055ca1a71a2f453f1414d062bf538f6a5b`
+- Served `index.html` SHA-256: `bf5a28a348f2233bab6235e0fe712cc2a61a8f7bca13644f0e9a54bf7d43e28c`
+- Served `src/app.js` SHA-256: `2cec84e25aea4a45f5bea092fcfecd758ff5ab03f7f732a0ad776ce4106e3e8c`
+- Public application manifest SHA-256: `cd03869dbbb1a749ae491b99a07ce0b573a8e9bc1757137c80201e6af5fe619d`
 - The served hashes matched the local application artifact exactly.
 
 ## Live WebMCP execution
@@ -50,7 +50,7 @@ This verifies real registration and execution in the recorded environment, not o
 ## Local executable evidence
 
 - `npm test`: 21/21 pass.
-- `npm run check`: syntax, required files, five definitions, registration seam, module entry, and no storage/network call in the HTML artifact.
+- `npm run check`: syntax, required files, five definitions, registration seam, one cache-versioned public module graph, module entry, and no storage/network call in the HTML artifact.
 - Local HTTP smoke: `/` returned the expected artifact; `/.env` and `/.git/config` returned 404.
 - Regression cases include known evidence and destination digest collisions, evidence changed after human confirmation, rejected asynchronous registration with residual executor deactivation, and allowlisted-name symlinks targeting an in-root secret.
 - The server test also covers dotfiles, non-allowlisted files, and internal/external symlink denial.

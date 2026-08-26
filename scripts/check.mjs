@@ -53,6 +53,14 @@ for (const file of codeFiles) {
 const html = readFileSync(resolve(root, "index.html"), "utf8");
 const definitions = readFileSync(resolve(root, "src/contracts.js"), "utf8");
 const webmcp = readFileSync(resolve(root, "src/webmcp.js"), "utf8");
+const publicModuleFiles = [
+  "index.html",
+  "src/app.js",
+  "src/policy.js",
+  "src/session.js",
+  "src/tools.js",
+  "src/webmcp.js",
+];
 const requiredNames = [
   "understand_problem",
   "collect_evidence",
@@ -72,6 +80,15 @@ if (!webmcp.includes("registerTool")) {
 }
 if (!html.includes('type="module"')) {
   console.error("index.html must load an ES module");
+  process.exit(1);
+}
+const publicModuleSources = publicModuleFiles.map((file) => readFileSync(resolve(root, file), "utf8"));
+const unversionedImport = publicModuleSources.some((source) => /(?:from\s+|src=)["']\.\/[^"']+\.js["']/.test(source));
+const cacheVersions = new Set(
+  publicModuleSources.flatMap((source) => [...source.matchAll(/\.js\?v=([A-Za-z0-9._-]+)/g)].map((match) => match[1])),
+);
+if (unversionedImport || cacheVersions.size !== 1) {
+  console.error("The public ES module graph must use one explicit cache version");
   process.exit(1);
 }
 if (html.includes("fetch(") || html.includes("localStorage") || html.includes("sessionStorage")) {

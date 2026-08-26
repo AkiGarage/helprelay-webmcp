@@ -17,7 +17,7 @@ HelpRelay does not claim that guidance is guaranteed safe. Browser text, model p
 - A synthetic 15-second story: an urgent prompt-injection banner and suspicious link are captured as untrusted evidence; an unsafe guess is blocked; one safe view-only step is offered; a separated trusted brief is prepared; and the story pauses on an exact destination/payload preview until a separate human confirmation prepares the local draft.
 - One domain handler used by both surfaces. When WebMCP is present, the human story runs through the exact registered `execute` functions and labels that path in the visible log.
 - No framework, package dependency, API key, analytics, network call, browser storage, or build step.
-- Built-in Node test and static-server scripts only.
+- Built-in Node test and static-server scripts only; the public ES module graph carries one explicit artifact version so a returning judge does not mix old and new modules.
 
 ## Run locally
 

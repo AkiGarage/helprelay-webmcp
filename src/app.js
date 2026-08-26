@@ -1,10 +1,10 @@
 import {
   ALLOWED_HANDOFF_CHANNEL,
   createTextResult,
-} from "./contracts.js";
-import { createSession, sessionEnvelope } from "./session.js";
-import { confirmHandoff, createDomainHandlers } from "./tools.js";
-import { registerWebMcpTools } from "./webmcp.js";
+} from "./contracts.js?v=20260826b";
+import { createSession, sessionEnvelope } from "./session.js?v=20260826b";
+import { confirmHandoff, createDomainHandlers } from "./tools.js?v=20260826b";
+import { registerWebMcpTools } from "./webmcp.js?v=20260826b";
 
 function sleep(milliseconds) {
   return new Promise((resolve) => setTimeout(resolve, milliseconds));
