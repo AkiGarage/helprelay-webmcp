@@ -20,7 +20,7 @@ The synthetic story uses a fictional urgent banner containing prompt-injection l
 
 ## How WebMCP is used
 
-The app statically calls `document.modelContext.registerTool` for the five imperative tools and awaits each registration result. Each definition has a concise description, closed input schema, annotations, and an execute function that forwards the browser-provided `AbortController` signal. A separate policy validates the envelope and action before the shared handler can mutate local state. Results are checked for a serializable text content block and structured content; partial registration deactivates every residual executor.
+The app statically calls `document.modelContext.registerTool` for the five imperative tools and awaits each registration result. `understand_problem` bootstraps a fresh session once and returns the complete envelope for later typed calls. Each definition has a concise description, closed input schema, annotations, and an execute function that forwards the browser-provided `AbortController` signal. A separate policy validates the envelope and action before the shared handler can mutate local state. Results are checked for a serializable text content block and structured content; partial registration deactivates every residual executor.
 
 ## Safety and privacy
 

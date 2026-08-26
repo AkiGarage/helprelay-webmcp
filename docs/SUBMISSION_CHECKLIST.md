@@ -8,6 +8,7 @@
 - [x] Run `git diff --check` and inspect the complete implementation diff.
 - [x] Confirm no secrets, real PII, real links, dependencies, storage, analytics, or application outbound calls are present.
 - [x] Verify the five exact WebMCP names and registration seam in the final artifact.
+- [x] Verify envelope-free first-call bootstrap, complete returned context, and closed repeated/partial bootstrap.
 - [x] Verify Promise rejection, residual-executor deactivation, evidence collision, stale confirmation, and in-root secret symlink regressions.
 
 ## Human verification gates

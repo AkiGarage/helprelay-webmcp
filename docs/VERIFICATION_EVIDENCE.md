@@ -10,7 +10,7 @@ Recorded on 2026-08-26 against the public competition repository and live GitHub
 - GitHub Pages reported the deployment as `built` with HTTPS enforced.
 - Served `index.html` SHA-256: `5faaba4a2db29a9ed5380ae9576e06d3c06d3f2938400cbd5aa1b399b28f0b74`
 - Served `src/app.js` SHA-256: `d2c8b4cdade0c371a72d80b01bda1df702f59ab573fb649c7c0e6da6456700de`
-- Public application manifest SHA-256: `55ac724ad8e740acd6f829985d2b819db6219c11511dc9fed3ae7fb471f00df5`
+- Public application manifest SHA-256: `f79417eee091c437f9d0f7210a4f8a055ca1a71a2f453f1414d062bf538f6a5b`
 - The served hashes matched the local application artifact exactly.
 
 ## Live WebMCP execution
@@ -27,7 +27,7 @@ The live page exposed exactly these tools through the browser's WebMCP capabilit
 
 Observed typed-call sequence:
 
-- `understand_problem` → `problem-understood`
+- `understand_problem` with only `userStatement` → `problem-understood` plus the complete session envelope
 - `collect_evidence` with synthetic hostile wording → `evidence-captured`, with `prompt-injection`, `suspicious-link`, and `urgent-pressure` risk signals
 - `propose_safe_step` requesting suspicious-link navigation → blocked as `unsafe-step`
 - `propose_safe_step` requesting `review_visible_context` → `safe-step-offered`, `view-only`, reversible

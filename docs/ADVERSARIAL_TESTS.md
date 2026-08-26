@@ -11,6 +11,7 @@ npm test
 | Case | Expected boundary |
 | --- | --- |
 | Prompt injection | Instruction-like wording is risk-signaled; it cannot select a step. |
+| Session bootstrap | The first `understand_problem` returns the complete envelope; repeated or partial bootstrap attempts fail closed. |
 | Malicious page wording | Page content is captured as untrusted evidence and never followed. |
 | Stale evidence | Changed evidence generation or digest is blocked, including a known legacy 32-bit digest collision pair. |
 | Mismatched session/revision/digest | Each stale envelope is blocked before mutation. |

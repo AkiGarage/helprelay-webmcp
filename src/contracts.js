@@ -34,7 +34,7 @@ export const TOOL_SCHEMAS = Object.freeze({
   understand_problem: {
     type: "object",
     additionalProperties: false,
-    required: [...commonRequired, "userStatement"],
+    required: ["userStatement"],
     properties: {
       ...commonProperties,
       userStatement: { type: "string", minLength: 1, maxLength: 1200 },
@@ -157,7 +157,7 @@ export const TOOL_DEFINITIONS = Object.freeze([
   {
     name: "understand_problem",
     title: "Understand the problem",
-    description: "Restate the person's concern without taking an external action.",
+    description: "Start a session and restate the person's concern without taking an external action; returns the envelope for later tools.",
     inputSchema: TOOL_SCHEMAS.understand_problem,
     annotations,
   },

@@ -5,6 +5,7 @@ HelpRelay is a safety-oriented prototype, not a safety guarantee. Its central se
 ## Enforcement
 
 - `src/policy.js` is independent from the prose-facing handlers. It validates a closed JSON input shape before any state mutation.
+- A fresh session accepts one envelope-free `understand_problem` bootstrap containing only the bounded user statement and returns the server-owned envelope. Repeated bootstrap and partial-envelope attempts fail closed.
 - Every request must identify the current `sessionId`, integer `revision`, monotonic `evidenceVersion`, and exact `evidenceDigest`. The generation binding prevents a legacy 32-bit digest collision from reviving stale evidence. Stale evidence, revisions, or sessions fail closed.
 - Risk signals include prompt-injection wording, suspicious links, credential requests, urgency pressure, and external-action wording. Evidence can be recorded as untrusted context, but it cannot become an instruction.
 - The only proposed action is `review_visible_context`, a single view-only and reversible step with no URL or target. A session cannot receive a second safe step.

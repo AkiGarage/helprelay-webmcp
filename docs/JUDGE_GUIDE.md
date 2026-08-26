@@ -8,7 +8,7 @@
 4. Watch the six visible steps: understand, collect untrusted evidence, block the suspicious guess, offer one view-only step, prepare a separated brief, and pause on the draft-only handoff preview.
    The event log prefixes each live step with **WebMCP tool**, proving the story uses the registered executor path rather than a separate UI-only simulation.
 5. Review the exact destination and brief payload, then click **Confirm this local draft**. This is the only action that mints the one-time human receipt and prepares a local draft; nothing is sent.
-6. In ChatGPT's in-app browser or Chrome `149+` with WebMCP enabled, inspect and call the five registered tools. Try `propose_safe_step` with a suspicious-link action or `request_handoff` without the UI-minted receipt; both close safely.
+6. Reload the page for a fresh agent session. In ChatGPT's in-app browser or Chrome `149+` with WebMCP enabled, call `understand_problem` with only `userStatement`, then carry its returned envelope into the later tools. Try `propose_safe_step` with a suspicious-link action or `request_handoff` without the UI-minted receipt; both close safely.
 
 ## What to look for
 

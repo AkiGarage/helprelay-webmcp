@@ -253,6 +253,22 @@ export function evaluateRequest({ toolName, input, session }) {
   if (!session || !isPlainObject(session)) {
     return failure("session-unavailable", "The current session is unavailable; the request is closed.");
   }
+  const envelopeFields = ["sessionId", "revision", "evidenceVersion", "evidenceDigest"];
+  const suppliedEnvelopeFields = envelopeFields.filter((field) => Object.prototype.hasOwnProperty.call(input, field));
+  if (toolName === "understand_problem" && suppliedEnvelopeFields.length === 0) {
+    if (
+      session.status !== "ready"
+      || session.revision !== 1
+      || session.evidenceVersion !== 0
+      || session.evidence.length !== 0
+    ) {
+      return failure("bootstrap-closed", "This session has already started; use the envelope returned by the first call.");
+    }
+    return success({ riskSignals: detectRiskSignals(input), bootstrap: true });
+  }
+  if (toolName === "understand_problem" && suppliedEnvelopeFields.length !== envelopeFields.length) {
+    return failure("malformed-input", "Provide the complete session envelope, or omit all envelope fields for the first call.");
+  }
   if (input.sessionId !== session.sessionId) {
     return failure("session-mismatch", "The request belongs to a different session.");
   }

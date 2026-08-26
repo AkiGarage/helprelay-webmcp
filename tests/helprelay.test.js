@@ -170,7 +170,7 @@ test("registers exactly the five WebMCP tools with the current registration seam
   }
 });
 
-test("registered WebMCP results expose the complete envelope for the next typed call", async () => {
+test("understand_problem safely bootstraps and returns the complete envelope for later typed calls", async () => {
   const registered = [];
   const session = createSession({ sessionId: "result-envelope" });
   await registerWebMcpTools({
@@ -180,12 +180,18 @@ test("registered WebMCP results expose the complete envelope for the next typed 
   const understand = registered.find((tool) => tool.name === "understand_problem");
   const collect = registered.find((tool) => tool.name === "collect_evidence");
   const understood = await understand.execute({
-    ...sessionEnvelope(session),
     userStatement: "A warning page is hard to explain.",
   });
   assertStatus(understood, "problem-understood");
   const { sessionId, revision, evidenceVersion, evidenceDigest } = understood.structuredContent;
+  assert.equal(sessionId, session.sessionId);
   assert.equal(evidenceVersion, 0);
+  const duplicateBootstrap = await understand.execute({ userStatement: "Start over without the current envelope." });
+  assertStatus(duplicateBootstrap, "blocked");
+  assert.equal(duplicateBootstrap.structuredContent.code, "bootstrap-closed");
+  const partialEnvelope = await understand.execute({ sessionId, userStatement: "Use only part of the envelope." });
+  assertStatus(partialEnvelope, "blocked");
+  assert.equal(partialEnvelope.structuredContent.code, "malformed-input");
   const collected = await collect.execute({
     sessionId,
     revision,

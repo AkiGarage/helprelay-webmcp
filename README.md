@@ -39,13 +39,13 @@ Public source: **https://github.com/AkiGarage/helprelay-webmcp**
 
 The intended judge path is ChatGPT's in-app browser or Chrome `149+` with the WebMCP flag available in that environment. API availability is detected at runtime. The app never treats “registered” as proof that a model actually executed a tool; execution should be observed in the supported judge environment.
 
-The registration adapter awaits every `registerTool` result, passes an `AbortController` signal into the same local handlers used by the page, and deactivates any residual partial surface if registration fails. Every result is checked for a serializable `content` array and `structuredContent` before it crosses the seam. A handoff confirmation is minted only by the human UI seam as a one-time local receipt bound to the current revision and evidence; a model cannot self-assert that receipt in tool JSON.
+The first `understand_problem` call safely bootstraps a fresh page session from only `userStatement` and returns the complete envelope required by every later typed call. Bootstrap is accepted once; a partial envelope or restart attempt fails closed. The registration adapter awaits every `registerTool` result, passes an `AbortController` signal into the same local handlers used by the page, and deactivates any residual partial surface if registration fails. Every result is checked for a serializable `content` array and `structuredContent` before it crosses the seam. A handoff confirmation is minted only by the human UI seam as a one-time local receipt bound to the current revision and evidence; a model cannot self-assert that receipt in tool JSON.
 
 ## Verification boundary
 
 Verified on 2026-08-26:
 
-- 21 executable tests covering prompt injection, malicious wording, stale state, complete result envelopes, evidence/destination digest collisions, suspicious links, external targets, irreversible requests, malformed envelopes/results, stale/unconfirmed handoff, replay, async registration rejection, and duplicate preparation;
+- 21 executable tests covering one-time session bootstrap, prompt injection, malicious wording, stale state, complete result envelopes, evidence/destination digest collisions, suspicious links, external targets, irreversible requests, malformed envelopes/results, stale/unconfirmed handoff, replay, async registration rejection, and duplicate preparation;
 - registration of all five names against a mocked `registerTool`;
 - a complete synthetic flow through the exact registered WebMCP `execute` functions;
 - JavaScript syntax, required-file checks, local HTTP serving, and denial of dotfiles, `.git`, `.env`, and symlink escapes;
