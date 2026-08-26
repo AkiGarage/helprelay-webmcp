@@ -7,7 +7,7 @@ Deliver the first public, dependency-free HelpRelay WebMCP Challenge implementat
 ## Constraints
 
 - Keep work inside this repository; preserve unrelated parent-workspace changes.
-- No dependencies, install, network, API keys, storage, analytics, commit, push, deploy, or external mutation.
+- No dependencies, install, API keys, storage, analytics, or application-side external mutation.
 - Maintain two outcomes: bounded guidance or a human-confirmed trusted-helper draft.
 
 ## Decisions
@@ -24,12 +24,15 @@ Deliver the first public, dependency-free HelpRelay WebMCP Challenge implementat
 - In-memory session, evidence digest, policy, output guard, human UI, synthetic story.
 - Built-in Node tests, local HTTP server/check scripts, registration rollback, bounded arrays, and explicit human-preview flow.
 - Required README, security/privacy/provenance and judge/submission documentation.
+- Public repository, MIT license detection, GitHub Pages deployment, and exact public URL.
+- Live WebMCP discovery and calls in Codex's supported in-app browser.
+- Desktop and 390px responsive UI readbacks, including the separate handoff confirmation.
 
 ## Now / Next
 
-- Run `npm test`, `npm run check`, local server + curl, and `git diff --check` / `git diff --cached --check`.
-- Human owner must verify the exact browser environment, public deployment, recording, legal text, and final submission.
+- Keep the final repository revision aligned with the recorded tests and deployed artifact.
+- Human owner records and publishes the required public video, accepts any legal/eligibility terms, and performs the final Devpost submission.
 
 ## Evidence boundary
 
-Local test results prove deterministic repository behavior only. They do not prove live WebMCP support, GitHub Pages availability, real user research, or safety in all situations.
+Local tests prove deterministic repository behavior. Separate readbacks prove the recorded GitHub Pages artifact and live WebMCP execution on 2026-08-26. Neither proves real-user outcomes or safety in every situation.

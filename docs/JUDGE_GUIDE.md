@@ -2,12 +2,12 @@
 
 ## Exact path (under one minute)
 
-1. Open the verified live URL or run `npm run serve -- --port 4173` and open the local URL.
+1. Open **https://akigarage.github.io/helprelay-webmcp/**.
 2. Confirm the first viewport shows the red unsafe guess beside the green policy-blocked WebMCP path.
 3. Click **Run the 15-second story**.
 4. Watch the six visible steps: understand, collect untrusted evidence, block the suspicious guess, offer one view-only step, prepare a separated brief, and pause on the draft-only handoff preview.
 5. Review the exact destination and brief payload, then click **Confirm this local draft**. This is the only action that mints the one-time human receipt and prepares a local draft; nothing is sent.
-6. If supported, use ChatGPT's in-app browser or Chrome `149+` with the WebMCP flag to inspect the five registered tools. The page reports when the registration surface is unavailable.
+6. In ChatGPT's in-app browser or Chrome `149+` with WebMCP enabled, inspect and call the five registered tools. Try `propose_safe_step` with a suspicious-link action or `request_handoff` without the UI-minted receipt; both close safely.
 
 ## What to look for
 
@@ -18,7 +18,7 @@
 
 ## Fixed judging criteria and tie-break
 
-This submission uses the challenge criteria in this fixed order:
+The four challenge criteria are equally weighted. This submission presents them in the official tie-break order:
 
 1. **WebMCP Leverage** — whether the five tools make the safe collaboration seam useful to a browser agent.
 2. **Execution** — whether the product is clear, runnable, accessible, and faithful to its boundaries.
@@ -29,7 +29,7 @@ If entries are otherwise tied, the tie-break prioritizes the criteria in that li
 
 ## Evidence limits
 
-The repository's tests verify deterministic local behavior. They do not verify live model execution, production hosting, measured accessibility, user research, or guaranteed safety. Those claims require human observation and sign-off.
+The repository's tests verify deterministic behavior. A separate 2026-08-26 run verified the deployed artifact, tool discovery and execution in Codex's supported in-app browser, and responsive UI readbacks. This does not establish measured accessibility, user research, or guaranteed safety.
 
 ## Supported environment
 

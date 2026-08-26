@@ -31,9 +31,9 @@ npm run serve -- --port 4173
 
 Then open `http://127.0.0.1:4173/`. The server is a local smoke-test helper implemented with Node's built-in `http` module; it makes no outbound request.
 
-The live competition URL is intentionally a placeholder until a human owner verifies the final GitHub Pages deployment:
+Live competition demo: **https://akigarage.github.io/helprelay-webmcp/**
 
-`[LIVE DEMO URL — human verification required]`
+Public source: **https://github.com/AkiGarage/helprelay-webmcp**
 
 ## WebMCP support
 
@@ -43,23 +43,26 @@ The registration adapter passes an `AbortController` signal from WebMCP's execut
 
 ## Verification boundary
 
-Verified in this repository:
+Verified on 2026-08-26:
 
 - deterministic policy behavior for prompt injection, malicious wording, stale state, suspicious links, external targets, irreversible requests, malformed envelopes/results, unconfirmed handoff, replay, and duplicate preparation;
 - registration of all five names against a mocked `registerTool`;
 - a complete synthetic flow through the public handler seam;
-- JavaScript syntax, required-file checks, and local HTTP serving when those commands are run by the owner.
+- JavaScript syntax, required-file checks, local HTTP serving, and denial of dotfiles, `.git`, `.env`, and symlink escapes;
+- GitHub Pages serving the checked application artifact over HTTPS;
+- all five tools discovered and called through live WebMCP in Codex's supported in-app browser, including an unsafe-step block and an unconfirmed-handoff block;
+- the human story pausing on the exact preview before a separate confirmation, with nothing sent; and
+- desktop and 390px responsive readbacks with no horizontal overflow, one `h1`, labelled controls, and 64px minimum button height.
 
-Not verified by this repository alone:
+Not claimed:
 
-- live browser/WebMCP implementation availability or model execution;
 - accessibility outcomes with real users or measured user research;
-- GitHub Pages deployment, public URL, screen recording, Devpost submission, or legal review;
+- screen recording, YouTube publication, Devpost submission, eligibility, or legal review;
 - a guarantee that any guidance is safe in every real-world situation.
 
-See [`docs/JUDGE_GUIDE.md`](docs/JUDGE_GUIDE.md), [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md), and [`docs/ADVERSARIAL_TESTS.md`](docs/ADVERSARIAL_TESTS.md) for the evidence and limits.
+See [`docs/VERIFICATION_EVIDENCE.md`](docs/VERIFICATION_EVIDENCE.md), [`docs/JUDGE_GUIDE.md`](docs/JUDGE_GUIDE.md), [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md), and [`docs/ADVERSARIAL_TESTS.md`](docs/ADVERSARIAL_TESTS.md) for the evidence and limits.
 
-The fixed judging criteria are **WebMCP Leverage**, **Execution**, **Potential Impact**, and **Creativity & Ambition**, in that order. The same listed order is the tie-break priority.
+The judging criteria are equally weighted: **WebMCP Leverage**, **Execution**, **Potential Impact**, and **Creativity & Ambition**. The same listed order is the tie-break priority, so the demo makes the WebMCP advantage visible first.
 
 ## License
 

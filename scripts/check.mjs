@@ -22,6 +22,7 @@ const requiredFiles = [
   "CONTINUITY.md",
   "docs/ARCHITECTURE.md",
   "docs/ADVERSARIAL_TESTS.md",
+  "docs/VERIFICATION_EVIDENCE.md",
   "docs/JUDGE_GUIDE.md",
   "docs/DEVPOST_SUBMISSION.md",
   "docs/VIDEO_SCRIPT.md",

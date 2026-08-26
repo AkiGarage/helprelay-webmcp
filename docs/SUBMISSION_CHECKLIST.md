@@ -2,21 +2,22 @@
 
 ## Repository and local evidence
 
-- [ ] Run `npm test` and retain the result.
-- [ ] Run `npm run check` and retain the result.
-- [ ] Run local HTTP server and `curl` the exact artifact.
-- [ ] Run `git diff --check` and inspect the complete diff.
-- [ ] Confirm no secrets, real PII, real links, dependencies, storage, analytics, or outbound calls are present.
-- [ ] Verify the five exact WebMCP names and registration seam in the final artifact.
+- [x] Run `npm test` and retain the result: 17/17 pass.
+- [x] Run `npm run check` and retain the result.
+- [x] Run local HTTP server and verify the exact artifact plus denied `.env` and `.git` paths.
+- [x] Run `git diff --check` and inspect the complete implementation diff.
+- [x] Confirm no secrets, real PII, real links, dependencies, storage, analytics, or application outbound calls are present.
+- [x] Verify the five exact WebMCP names and registration seam in the final artifact.
 
 ## Human verification gates
 
-- [ ] Human observes ChatGPT in-app browser or Chrome `149+` WebMCP support.
-- [ ] Human verifies the exact GitHub Pages URL and the served artifact.
+- [x] Observe Codex's supported in-app browser discovering and executing all five WebMCP tools.
+- [x] Verify https://akigarage.github.io/helprelay-webmcp/ and match the served application hashes to the repository artifact.
+- [x] Check desktop and 390px responsive readbacks, labelled controls, explicit preview/confirmation, and no horizontal overflow.
 - [ ] Human records the video and checks the first 15 seconds against `docs/VIDEO_SCRIPT.md`.
-- [ ] Human reviews accessibility, legal language, and any Devpost required fields.
-- [ ] Human adds the final repository, live demo, and video URLs.
+- [ ] Human reviews eligibility, legal language, and any Devpost required fields.
+- [ ] Human adds the final video URL; repository and live demo URLs are complete.
 - [ ] Human completes YouTube upload and any YouTube visibility/legal acknowledgement.
 - [ ] Human reviews and submits Devpost.
 
-YouTube, Devpost legal review, final submission, publication, and any external message remain human-only. This checklist does not authorize those actions.
+YouTube publication, Devpost eligibility/legal review, and final submission remain human-only. This checklist does not authorize those actions.

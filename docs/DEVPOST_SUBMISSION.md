@@ -32,14 +32,14 @@ HTML, CSS, ES modules, and Node `>=22` built-in test/server modules. No dependen
 
 ## Links and media
 
-- Live demo: `[HUMAN VERIFICATION REQUIRED]`
+- Live demo: https://akigarage.github.io/helprelay-webmcp/
 - Demo video: `[YOUTUBE URL — HUMAN-ONLY FINALIZATION]`
-- Repository: `[PUBLIC REPOSITORY URL — HUMAN VERIFICATION REQUIRED]`
+- Repository: https://github.com/AkiGarage/helprelay-webmcp
 
 ## Claims we can support now
 
-Local executable tests cover the adversarial boundaries listed in `docs/ADVERSARIAL_TESTS.md`, plus registration and an end-to-end synthetic flow. Live WebMCP execution, deployment, user research, and final legal/submission status are intentionally not claimed until a human owner verifies them.
+Executable tests cover the adversarial boundaries listed in `docs/ADVERSARIAL_TESTS.md`, registration, static-serving containment, and an end-to-end synthetic flow. On 2026-08-26, the deployed GitHub Pages artifact exposed all five tools and completed real tool calls in Codex's supported in-app browser. User research, guaranteed safety, final video publication, eligibility/legal review, and Devpost submission are not claimed.
 
 ## Fixed judging criteria
 
-The intended evaluation order is **WebMCP Leverage**, **Execution**, **Potential Impact**, then **Creativity & Ambition**. If a tie remains, the listed order is the tie-break priority.
+The criteria are equally weighted: **WebMCP Leverage**, **Execution**, **Potential Impact**, and **Creativity & Ambition**. If a tie remains, that listed order is the tie-break priority.

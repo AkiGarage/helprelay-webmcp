@@ -26,4 +26,4 @@ npm test
 | Static serving | Dotfiles, `.git`, `.env`, non-allowlisted files, and symlink escapes are not served. |
 | End-to-end story | Understand → evidence → block → safe step → brief → exact preview pause → explicit local draft confirmation. |
 
-These are executable contract tests, not proof against every browser or model implementation. The live WebMCP environment and final public artifact remain unverified until a human owner observes them.
+These are executable contract tests, not proof against every browser or model implementation. On 2026-08-26, the GitHub Pages artifact was separately exercised through live WebMCP in Codex's supported in-app browser; the exact readback is recorded in `docs/VERIFICATION_EVIDENCE.md`.

@@ -13,11 +13,11 @@ Target duration: 2:20. The first 15 seconds show the product action, not a title
 | 0:55–1:20 | Show safe-step result and the green card. | “The only allowlisted step is to review visible context together. It is reversible, and nothing opens automatically.” |
 | 1:20–1:45 | Show trusted brief arrays: facts, interpretations, uncertainty, attempts. | “If the person is still stuck, the brief keeps facts separate from interpretations and uncertainty.” |
 | 1:45–2:05 | Show the exact destination and separated brief payload preview, then click **Confirm this local draft** once. | “The story pauses until a person reviews the exact destination and payload. That one click prepares a local draft; it does not send.” |
-| 2:05–2:20 | Show WebMCP availability badge and five names in a test/registration view. | “The same handlers serve the human UI and exactly five WebMCP tools. The local tests verify the boundary; live browser execution still needs observation.” |
+| 2:05–2:20 | Show the live WebMCP badge, five registered names, and a blocked tool result. | “The same handlers serve the human UI and exactly five live WebMCP tools. Typed calls are useful; unsafe calls still fail closed.” |
 
 ## Production notes
 
 - Use synthetic data only; do not show a real URL, trademark, contact, credential, or person.
 - Capture the first action within the first 15 seconds.
-- Do not imply live WebMCP or hosting until the owner observes the exact environment.
+- Record the verified live URL and supported WebMCP environment; do not substitute a mocked registration screen.
 - Keep the final upload and any submission click as human-only actions.
