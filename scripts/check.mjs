@@ -6,6 +6,7 @@ import { fileURLToPath } from "node:url";
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const requiredFiles = [
   "index.html",
+  "ja/index.html",
   "styles.css",
   "src/contracts.js",
   "src/policy.js",
@@ -51,10 +52,12 @@ for (const file of codeFiles) {
 }
 
 const html = readFileSync(resolve(root, "index.html"), "utf8");
+const japaneseHtml = readFileSync(resolve(root, "ja/index.html"), "utf8");
 const definitions = readFileSync(resolve(root, "src/contracts.js"), "utf8");
 const webmcp = readFileSync(resolve(root, "src/webmcp.js"), "utf8");
 const publicModuleFiles = [
   "index.html",
+  "ja/index.html",
   "src/app.js",
   "src/policy.js",
   "src/session.js",
@@ -78,8 +81,8 @@ if (!webmcp.includes("registerTool")) {
   console.error("WebMCP registerTool seam is missing");
   process.exit(1);
 }
-if (!html.includes('type="module"')) {
-  console.error("index.html must load an ES module");
+if (![html, japaneseHtml].every((source) => source.includes('type="module"'))) {
+  console.error("Every public HTML entry point must load an ES module");
   process.exit(1);
 }
 const publicModuleSources = publicModuleFiles.map((file) => readFileSync(resolve(root, file), "utf8"));
@@ -91,7 +94,7 @@ if (unversionedImport || cacheVersions.size !== 1) {
   console.error("The public ES module graph must use one explicit cache version");
   process.exit(1);
 }
-if (html.includes("fetch(") || html.includes("localStorage") || html.includes("sessionStorage")) {
+if ([html, japaneseHtml].some((source) => source.includes("fetch(") || source.includes("localStorage") || source.includes("sessionStorage"))) {
   console.error("The static prototype must not call network or browser storage APIs");
   process.exit(1);
 }

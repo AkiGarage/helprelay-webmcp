@@ -28,7 +28,7 @@ function assertStatus(result, status) {
   assert.equal(result?.structuredContent?.status, status, result?.content?.[0]?.text);
 }
 
-function makeFakeDocument({ withWebMcp = false } = {}) {
+function makeFakeDocument({ withWebMcp = false, lang = "en" } = {}) {
   const nodes = new Map();
   const makeNode = (extra = {}) => ({
     textContent: "",
@@ -69,6 +69,7 @@ function makeFakeDocument({ withWebMcp = false } = {}) {
     nodes.set(selector, node);
   }
   const documentRef = {
+    documentElement: { lang },
     querySelector(selector) {
       const stepMatch = /^\[data-step="([^"]+)"\]$/.exec(selector);
       return stepMatch ? stepNodes.get(stepMatch[1]) ?? null : nodes.get(selector) ?? null;
@@ -726,12 +727,29 @@ test("the story pauses at the exact preview until a separate button click", asyn
   await secondRun;
 });
 
+test("Japanese evaluation view localizes the UI while preserving the same WebMCP tools and human gate", async () => {
+  const documentRef = makeFakeDocument({ withWebMcp: true, lang: "ja" });
+  const app = await boot(documentRef);
+  await app.runStory();
+
+  assert.deepEqual(documentRef.registeredTools.map((tool) => tool.name), TOOL_NAMES);
+  assert.match(documentRef.nodes.get("#webmcp-status").textContent, /WebMCP接続済み/);
+  assert.match(documentRef.nodes.get("#handoff-destination").textContent, /信頼できる人/);
+  assert.match(documentRef.nodes.get("#handoff-payload").textContent, /わかったこと/);
+  assert.match(documentRef.nodes.get("#story-status").textContent, /安全に一時停止/);
+  assert.equal(app.handlers.session.handoff, null);
+  assert.equal(documentRef.nodes.get("#confirm-handoff").disabled, false);
+});
+
 test("static server exposes only real allowlisted files and rejects secrets and symlink escapes", async () => {
   const root = await mkdtemp(join(tmpdir(), "helprelay-public-"));
   const outsideRoot = await mkdtemp(join(tmpdir(), "helprelay-outside-"));
   const src = join(root, "src");
+  const ja = join(root, "ja");
   await mkdir(src);
+  await mkdir(ja);
   await writeFile(join(root, "index.html"), "safe index");
+  await writeFile(join(ja, "index.html"), "safe Japanese index");
   await writeFile(join(root, ".env"), "SECRET=do-not-serve");
   await symlink(".env", join(root, "styles.css"));
   const outsideFile = join(outsideRoot, "outside.js");
@@ -741,6 +759,7 @@ test("static server exposes only real allowlisted files and rejects secrets and 
     const realIndex = await realpath(join(root, "index.html"));
     assert.equal(resolvePublicFile("/index.html", root), realIndex);
     assert.equal(resolvePublicFile("/", root), realIndex);
+    assert.equal(resolvePublicFile("/ja/", root), await realpath(join(ja, "index.html")));
     for (const path of ["/.env", "/.git/config", "/README.md", "/src/secret.js", "/../index.html", "/styles.css", "/src/app.js"]) {
       assert.equal(resolvePublicFile(path, root), null, path);
     }

@@ -6,6 +6,7 @@ import { fileURLToPath } from "node:url";
 export const ROOT_DIR = resolve(fileURLToPath(new URL("..", import.meta.url)));
 export const PUBLIC_FILES = Object.freeze(new Set([
   "index.html",
+  "ja/index.html",
   "styles.css",
   "src/app.js",
   "src/contracts.js",
@@ -30,7 +31,11 @@ export function resolvePublicFile(urlPath, rootDir = ROOT_DIR) {
   try {
     const root = realpathSync(resolve(rootDir));
     const pathPart = decodeURIComponent((urlPath || "/").split("?")[0]);
-    const relativePath = pathPart === "/" ? "index.html" : pathPart.replace(/^\/+/, "");
+    const relativePath = pathPart === "/"
+      ? "index.html"
+      : pathPart.endsWith("/")
+        ? `${pathPart.replace(/^\/+/, "")}index.html`
+        : pathPart.replace(/^\/+/, "");
     const segments = relativePath.split(/[\\/]+/);
     if (segments.some((segment) => segment.startsWith("."))) return null;
     const candidate = resolve(root, relativePath);
