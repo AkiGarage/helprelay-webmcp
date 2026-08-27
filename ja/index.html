@@ -6,7 +6,7 @@
     <meta name="theme-color" content="#ffffff">
     <meta name="description" content="HelpRelayは、ネットで何か変だと感じたときに、危険な操作を止めて安心できる一歩を案内するアプリです。">
     <title>HelpRelay — 安心できる次の一歩</title>
-    <link rel="stylesheet" href="../styles.css?v=20260827b">
+    <link rel="stylesheet" href="../styles.css?v=20260827c">
   </head>
   <body>
     <header class="site-header">
@@ -29,11 +29,19 @@
     <main id="main-content" class="shell app-shell" tabindex="-1">
       <section class="relay-section" aria-labelledby="relay-title">
         <div class="relay-intro">
-          <div>
-            <p class="screen-kicker">安心リレー</p>
+          <div class="intro-copy">
             <h1 id="relay-title">タップする前に、ひと呼吸。</h1>
+            <p>今見えているものだけを確かめ、危ない操作は止めて、安心できる次の一歩をひとつだけご案内します。</p>
           </div>
-          <p>今見えているものだけを確かめ、危ない操作は止めて、安心できる次の一歩をひとつだけご案内します。</p>
+          <div class="desktop-start">
+            <button id="run-story" class="button button-primary" type="button">
+              <span class="button-label">安心できる道を見てみる</span>
+              <span class="button-arrow" aria-hidden="true">→</span>
+            </button>
+            <div id="story-status" class="story-status" role="status" aria-live="polite">
+              準備できました。練習用データだけを使い、外部には何も起こりません。
+            </div>
+          </div>
         </div>
 
         <div class="mobile-start">
@@ -47,147 +55,53 @@
         </div>
 
         <div id="relay-stage" class="relay-stage" data-phase="ready">
-          <svg class="relay-map" viewBox="0 0 1320 560" preserveAspectRatio="none" aria-hidden="true">
-            <path class="relay-track" d="M142 264 C285 264 280 136 438 136 S655 264 768 264 S1012 158 1186 158"></path>
-            <path class="relay-flow" d="M142 264 C285 264 280 136 438 136 S655 264 768 264 S1012 158 1186 158"></path>
-            <path class="relay-unsafe" d="M660 262 C700 306 712 351 768 351"></path>
-            <path class="relay-safe" d="M768 264 C919 264 1012 158 1186 158"></path>
-          </svg>
+          <div class="relay-primary">
+            <article class="relay-person" aria-labelledby="person-title">
+              <div class="scene-heading"><span class="scene-number">1</span><div><p>気づいたこと</p><h2 id="person-title">なんだか変だと感じた</h2></div></div>
+              <div class="browser-moment" aria-label="練習用の、あやしいブラウザ画面">
+                <div class="browser-chrome" aria-hidden="true"><span></span><span></span><span></span><b>hxxps://suspicious.invalid</b></div>
+                <div class="browser-message"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M24 6 5 40h38L24 6Z"></path><path d="M24 18v10"></path><circle cx="24" cy="34" r="1.5"></circle></svg><div><strong>確認が必要です</strong><span>続けるにはパスワードを入力してください。</span></div></div>
+                <button class="fake-page-action" type="button" disabled>続ける</button>
+                <p>架空のページです・ボタンは押せません</p>
+              </div>
+              <p class="person-thought">「本物かどうか、私にはわからない…」</p>
+            </article>
 
-          <article class="relay-person" aria-labelledby="person-title">
-            <div class="scene-heading">
-              <span class="scene-number">1</span>
-              <div>
-                <p>あなた</p>
-                <h2 id="person-title">なんだか変だと感じた</h2>
+            <section class="relay-policy" aria-labelledby="policy-title">
+              <div class="scene-heading"><span class="scene-number">2</span><div><p>独立した安全チェック</p><h2 id="policy-title">HelpRelayが、先に境界を決めます</h2></div></div>
+              <div class="decision-stack">
+                <div class="decision-card decision-card-danger policy-branch policy-branch-danger" data-step="blocked" data-state="pending"><span class="decision-icon" aria-hidden="true">×</span><div><p>安全ルールで止めました</p><strong>あやしいリンクを開く</strong><span>リンクを開かず、パスワードも入力しません。</span></div><span class="step-state">安全ルールで停止</span></div>
+                <div class="decision-card decision-card-safe policy-branch policy-branch-safe" data-step="safe" data-state="pending"><span class="decision-icon" aria-hidden="true">✓</span><div><p>安心できる次の一歩</p><strong>今見えている画面だけを確認</strong><span>見るだけです。画面の設定は変わりません。</span></div><span class="step-state">見るだけ</span></div>
               </div>
-            </div>
-            <div class="browser-moment" aria-label="練習用の、あやしいブラウザ画面">
-              <div class="browser-chrome" aria-hidden="true">
-                <span></span><span></span><span></span>
-                <b>hxxps://suspicious.invalid</b>
-              </div>
-              <div class="browser-message">
-                <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M24 6 5 40h38L24 6Z"></path><path d="M24 18v10"></path><circle cx="24" cy="34" r="1.5"></circle></svg>
-                <div>
-                  <strong>確認が必要です</strong>
-                  <span>続けるにはパスワードを入力してください。</span>
-                </div>
-              </div>
-              <button class="fake-page-action" type="button" disabled>続ける</button>
-              <p>架空のページです・ボタンは押せません</p>
-            </div>
-            <p class="person-thought">「本物かどうか、私にはわからない…」</p>
-          </article>
-
-          <section class="relay-policy" aria-labelledby="policy-title">
-            <div class="scene-heading">
-              <span class="scene-number">2</span>
-              <div>
-                <p>安全ルールとAI</p>
-                <h2 id="policy-title">HelpRelayが、してよいことを確かめます</h2>
-              </div>
-            </div>
-            <ol class="tool-route" aria-label="5つのWebMCP tools">
-              <li data-step="understand" data-state="pending">
-                <span class="tool-index">01</span>
-                <code>understand_problem</code>
-                <span class="step-state">準備できました</span>
-              </li>
-              <li data-step="evidence" data-state="pending">
-                <span class="tool-index">02</span>
-                <code>collect_evidence</code>
-                <span class="step-state">準備できました</span>
-              </li>
-              <li class="tool-split">
-                <div class="tool-main">
-                  <span class="tool-index">03</span>
-                  <code>propose_safe_step</code>
-                </div>
-                <div class="policy-branches">
-                  <div class="policy-branch policy-branch-danger" data-step="blocked" data-state="pending">
-                    <span>あやしいリンクを開く</span>
-                    <strong class="step-state">安全ルールで停止</strong>
-                  </div>
-                  <div class="policy-branch policy-branch-safe" data-step="safe" data-state="pending">
-                    <span>今見えている画面だけを確認</span>
-                    <strong class="step-state">見るだけ</strong>
-                  </div>
-                </div>
-              </li>
-              <li data-step="brief" data-state="pending">
-                <span class="tool-index">04</span>
-                <code>prepare_trusted_brief</code>
-                <span class="step-state">準備できました</span>
-              </li>
-              <li data-step="handoff" data-state="pending">
-                <span class="tool-index">05</span>
-                <code>request_handoff</code>
-                <span class="step-state">本人の確認が必要</span>
-              </li>
-            </ol>
-            <p class="policy-reassurance"><span aria-hidden="true">✓</span> 画面に書かれた言葉をうのみにせず、安全ルールが先に確かめます。</p>
-          </section>
-
-          <article class="relay-helper" aria-labelledby="helper-title">
-            <div class="scene-heading">
-              <span class="scene-number">3</span>
-              <div>
-                <p>信頼できる人</p>
-                <h2 id="helper-title">必要なときだけ、頼れます</h2>
-              </div>
-            </div>
-            <div class="safe-step-preview">
-              <span class="safe-check" aria-hidden="true">✓</span>
-              <div>
-                <p>安心できる次の一歩</p>
-                <strong>今見えているものだけを確認する</strong>
-                <span>リンクは開きません。設定も変わりません。</span>
-              </div>
-            </div>
-
-            <div id="helper-preview-placeholder" class="brief-placeholder">
-              <div class="brief-titleline">
-                <span>相談メモ</span>
-                <strong>この端末だけの下書き</strong>
-              </div>
-              <p>わかったこと、まだわからないこと、安心できる手順を、送る前にここで確認できます。</p>
-              <div class="brief-lines" aria-hidden="true"><span></span><span></span><span></span></div>
-            </div>
-
-            <section id="handoff-preview" class="handoff-preview" aria-labelledby="handoff-preview-title" hidden>
-              <div class="brief-titleline">
-                <span id="handoff-preview-title">相談メモ</span>
-                <strong>この端末だけの下書き</strong>
-              </div>
-              <div class="preview-block">
-                <h3>誰に見てもらうか</h3>
-                <pre id="handoff-destination" class="preview-value"></pre>
-              </div>
-              <div class="preview-block preview-block-scroll">
-                <h3>相手に見える内容</h3>
-                <pre id="handoff-payload" class="preview-value"></pre>
-              </div>
-              <details class="raw-preview">
-                <summary>実際の下書き内容をそのまま確認する</summary>
-                <pre id="handoff-raw-payload" class="preview-value"></pre>
-              </details>
-              <button id="confirm-handoff" class="button button-confirm" type="button" disabled>
-                この下書き内容を確認する
-              </button>
-              <p class="confirmation-note">確認しても下書きが整うだけです。送信はしません。</p>
+              <p class="policy-reassurance"><span aria-hidden="true">✓</span> 画面の言葉をうのみにせず、決められた安全ルールが先に確かめます。</p>
             </section>
-            <p class="not-sent"><span aria-hidden="true">●</span> まだ誰にも送っていません</p>
-          </article>
-        </div>
+          </div>
 
-        <div class="relay-controls">
-          <button id="run-story" class="button button-primary" type="button">
-            <span class="button-label">安心できる道を見てみる</span>
-            <span class="button-arrow" aria-hidden="true">→</span>
-          </button>
-          <div id="story-status" class="story-status" role="status" aria-live="polite">
-            準備できました。練習用データだけを使い、外部には何も起こりません。
+          <div class="relay-support">
+            <section class="tool-provenance" aria-labelledby="tools-title">
+              <div class="support-heading"><div><p>本物のWebMCP経路</p><h2 id="tools-title">5つの小さな道具が、ひとつずつ確認</h2></div><span>実行状態を表示</span></div>
+              <ol class="tool-route" aria-label="5つのWebMCP tools">
+                <li data-step="understand" data-state="pending"><span class="tool-index">01</span><code>understand_problem</code><span class="step-state">準備できました</span></li>
+                <li data-step="evidence" data-state="pending"><span class="tool-index">02</span><code>collect_evidence</code><span class="step-state">準備できました</span></li>
+                <li class="tool-split"><span class="tool-index">03</span><code>propose_safe_step</code><span class="step-state">安全ルール</span></li>
+                <li data-step="brief" data-state="pending"><span class="tool-index">04</span><code>prepare_trusted_brief</code><span class="step-state">準備できました</span></li>
+                <li data-step="handoff" data-state="pending"><span class="tool-index">05</span><code>request_handoff</code><span class="step-state">本人の確認が必要</span></li>
+              </ol>
+            </section>
+
+            <article class="relay-helper" aria-labelledby="helper-title">
+              <div class="scene-heading"><span class="scene-number">3</span><div><p>相談メモ</p><h2 id="helper-title">内容と相手は、あなたが確認</h2></div></div>
+              <div id="helper-preview-placeholder" class="brief-placeholder"><div class="brief-titleline"><span>相談メモ</span><strong>この端末だけの下書き</strong></div><p>わかったこと、まだわからないこと、見るだけの手順をまとめます。相談する相手を選び、別に確認するまでは進みません。</p><div class="brief-promise"><span aria-hidden="true">✓</span> 自動では送りません</div></div>
+              <section id="handoff-preview" class="handoff-preview" aria-labelledby="handoff-preview-title" hidden>
+                <div class="brief-titleline"><span id="handoff-preview-title">相談メモ</span><strong>この端末だけの下書き</strong></div>
+                <div class="preview-block"><h3>誰に見てもらうか</h3><pre id="handoff-destination" class="preview-value"></pre></div>
+                <div class="preview-block preview-block-scroll"><h3>相手に見える内容</h3><pre id="handoff-payload" class="preview-value"></pre></div>
+                <details class="raw-preview"><summary>実際の下書き内容をそのまま確認する</summary><pre id="handoff-raw-payload" class="preview-value"></pre></details>
+                <button id="confirm-handoff" class="button button-confirm" type="button" disabled>内容と相手を確認する</button>
+                <p class="confirmation-note">別の確認をしても、ここでは記録を作るだけです。</p>
+              </section>
+              <p class="not-sent"><span aria-hidden="true">●</span> まだ誰にも送っていません</p>
+            </article>
           </div>
         </div>
 
@@ -219,6 +133,6 @@
         <p>練習用データ・パスワード不要・保存なし・勝手な外部操作なし</p>
       </div>
     </footer>
-    <script type="module" src="../src/app.js?v=20260827b"></script>
+    <script type="module" src="../src/app.js?v=20260827c"></script>
   </body>
 </html>

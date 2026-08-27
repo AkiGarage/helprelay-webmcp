@@ -1,15 +1,14 @@
-# The Safe Relay — selected UI concept
+# Calm Guided Focus — selected UI concept
 
 ## Selection
 
-Concept A is the implementation authority. It makes WebMCP's advantage visible without developer language: a person's confusing browser moment enters a clearly named policy gate, the unsafe route stops in coral, one bounded route continues in jade, and a trusted helper receives only a local draft. Concept B's illustrated stepping-stone metaphor felt warmer, but it was more childlike and made the five typed tools less central.
+The desktop revision in `desktop-revision-selected.png` is the implementation authority. It keeps the person's confusing browser moment beside one dominant safety decision, then places the five-tool execution proof and the local Trusted Brief on a quieter second tier. This removes the prototype-like three-column storyboard and crossing branch lines while preserving the complete WebMCP story.
 
-Selected references:
+Selected reference:
 
-- `docs/ui-concepts/concept-a-desktop-selected.png`
-- `docs/ui-concepts/concept-a-mobile-selected.png`
+- `docs/ui-concepts/desktop-revision-selected.png`
 
-Alternative explored:
+Earlier alternatives retained for provenance:
 
 - `docs/ui-concepts/concept-b-desktop.png`
 - `docs/ui-concepts/concept-b-mobile.png`
@@ -33,7 +32,7 @@ The opening view must communicate the whole relay in fifteen seconds or less:
 - Active route: cobalt `#2f66e8`.
 - Unsafe route: coral `#e75b49`; never use alarming full-screen red.
 - Safe route: jade `#258a62`.
-- Lines: quiet gray `#dde1e8`; relay paths are 3–4 px with rounded ends.
+- Lines: quiet gray `#dde1e8`; separators show grouping, never branching paths over content.
 - Typeface: local humanist/rounded system stack; no external font dependency.
 - Body copy: minimum 17 px, line-height 1.55 or greater.
 - Controls: minimum 52 px height, obvious focus ring, plain action language.
@@ -43,12 +42,11 @@ The opening view must communicate the whole relay in fifteen seconds or less:
 ## Desktop composition — 1920 × 1080
 
 - Compact top bar: HelpRelay wordmark, one-line promise, and real WebMCP connection status.
-- One open relay stage, divided by hairlines rather than a wall of cards:
-  - **You:** the synthetic suspicious page and the person's plain-language concern.
-  - **Policy & AI:** exactly five typed WebMCP tools, including the split unsafe/safe result of `propose_safe_step`.
-  - **Trusted helper:** the allowlisted view-only step, Trusted Brief preview, separate confirmation, and “Nothing has been sent.”
-- A curved cobalt relay line carries attention left to right. Coral ends at the policy gate; jade continues to the local draft.
-- One dominant action sits under the relay. Technical event output is a secondary disclosure.
+- A two-tier reading order replaces the equal three-column storyboard:
+  - **Primary tier:** the synthetic suspicious page beside one dominant safety decision. Coral stops the unsafe action; jade identifies the single view-only step.
+  - **Proof tier:** the five exact WebMCP tools form a compact execution rail; the Trusted Brief sits beside it as a local draft with a separate confirmation.
+- No branch line crosses copy or competes with the decision surfaces.
+- One dominant action sits beside the opening promise, inside the first viewport. Technical event output is a secondary disclosure.
 - The core relay, action, reassurance, and handoff pause must fit in the first 1080 px.
 
 ## Mobile composition
@@ -61,7 +59,7 @@ The opening view must communicate the whole relay in fifteen seconds or less:
 
 ## Interaction and motion
 
-- Running the story advances one tool at a time with a brief line pulse and state change.
+- Running the story advances one tool at a time through restrained state changes.
 - Pending, active, blocked, safe, and complete states use shape, copy, and color together.
 - Motion duration stays between 180 and 420 ms; no parallax or decorative looping.
 - Under `prefers-reduced-motion: reduce`, transitions and animations stop immediately and all state changes remain understandable.
