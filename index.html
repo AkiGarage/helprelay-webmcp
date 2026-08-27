@@ -6,7 +6,7 @@
     <meta name="theme-color" content="#ffffff">
     <meta name="description" content="HelpRelay is a warm, safety-checked relay between a person, a browser agent, and a trusted helper.">
     <title>HelpRelay — one safe next step</title>
-    <link rel="stylesheet" href="./styles.css?v=20260827c">
+    <link rel="stylesheet" href="./styles.css?v=20260827d">
   </head>
   <body>
     <header class="site-header">
@@ -34,7 +34,7 @@
             <p>We’ll check what you can see, stop the risky guess, and offer one gentle next step.</p>
           </div>
           <div class="desktop-start">
-            <button id="run-story" class="button button-primary" type="button">
+            <button id="run-story" class="button button-primary" type="button" disabled>
               <span class="button-label">Show me the safe path</span>
               <span class="button-arrow" aria-hidden="true">→</span>
             </button>
@@ -45,7 +45,7 @@
         </div>
 
         <div class="mobile-start">
-          <button id="run-story-mobile" class="button button-primary" type="button">
+          <button id="run-story-mobile" class="button button-primary" type="button" disabled>
             <span class="button-label">Show me the safe path</span>
             <span class="button-arrow" aria-hidden="true">→</span>
           </button>
@@ -79,11 +79,11 @@
 
           <div class="relay-support">
             <section class="tool-provenance" aria-labelledby="tools-title">
-              <div class="support-heading"><div><p>Real WebMCP path</p><h2 id="tools-title">Five small tools, one bounded job each</h2></div><span>Live execution states</span></div>
-              <ol class="tool-route" aria-label="Five WebMCP tools">
+              <div class="support-heading"><div><p>Real WebMCP path</p><h2 id="tools-title">Five small tools, one bounded job each</h2></div><span id="tool-progress-status" class="tool-progress-status" role="status" aria-live="polite">Watch each tool move</span></div>
+              <ol class="tool-route" aria-label="Five WebMCP tools" data-progress="0">
                 <li data-step="understand" data-state="pending"><span class="tool-index">01</span><code>understand_problem</code><span class="step-state">Ready</span></li>
                 <li data-step="evidence" data-state="pending"><span class="tool-index">02</span><code>collect_evidence</code><span class="step-state">Ready</span></li>
-                <li class="tool-split"><span class="tool-index">03</span><code>propose_safe_step</code><span class="step-state">Policy gate</span></li>
+                <li class="tool-split" data-step="policy" data-state="pending"><span class="tool-index">03</span><code>propose_safe_step</code><span class="step-state">Policy gate</span></li>
                 <li data-step="brief" data-state="pending"><span class="tool-index">04</span><code>prepare_trusted_brief</code><span class="step-state">Ready</span></li>
                 <li data-step="handoff" data-state="pending"><span class="tool-index">05</span><code>request_handoff</code><span class="step-state">Human gate</span></li>
               </ol>
@@ -133,6 +133,6 @@
         <p>Synthetic demo · no credentials · no storage · no automatic external action</p>
       </div>
     </footer>
-    <script type="module" src="./src/app.js?v=20260827c"></script>
+    <script type="module" src="./src/app.js?v=20260827d"></script>
   </body>
 </html>

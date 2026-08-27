@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { mkdir, mkdtemp, realpath, rm, symlink, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, readFile, realpath, rm, symlink, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { PassThrough } from "node:stream";
@@ -44,12 +44,12 @@ function makeFakeDocument({ withWebMcp = false, lang = "en" } = {}) {
     },
     ...extra,
   });
-  const runButton = makeNode();
-  const mobileRunButton = makeNode();
+  const runButton = makeNode({ disabled: true });
+  const mobileRunButton = makeNode({ disabled: true });
   const confirmButton = makeNode();
   const eventLog = makeNode({ scrollHeight: 0, scrollTop: 0 });
   const stepNodes = new Map();
-  for (const name of ["understand", "evidence", "blocked", "safe", "brief", "handoff"]) {
+  for (const name of ["understand", "evidence", "policy", "blocked", "safe", "brief", "handoff"]) {
     const state = makeNode();
     stepNodes.set(name, { dataset: {}, querySelector: () => state });
   }
@@ -63,6 +63,8 @@ function makeFakeDocument({ withWebMcp = false, lang = "en" } = {}) {
     ["#handoff-payload", makeNode()],
     ["#story-status", makeNode()],
     ["#mobile-story-status", makeNode()],
+    ["#tool-progress-status", makeNode()],
+    [".tool-route", makeNode()],
     ["#webmcp-status", makeNode()],
     ["#human-status", makeNode()],
   ]) {
@@ -172,6 +174,21 @@ test("registers exactly the five WebMCP tools with the current registration seam
     assert.equal(definition.annotations.readOnlyHint, true);
     assert.equal(definition.annotations.untrustedContentHint, true);
   }
+});
+
+test("story buttons stay disabled in static HTML until boot finishes WebMCP registration", async () => {
+  for (const relativePath of ["../index.html", "../ja/index.html"]) {
+    const html = await readFile(new URL(relativePath, import.meta.url), "utf8");
+    assert.match(html, /<button id="run-story"[^>]*\sdisabled>/);
+    assert.match(html, /<button id="run-story-mobile"[^>]*\sdisabled>/);
+  }
+
+  const documentRef = makeFakeDocument({ withWebMcp: true });
+  assert.equal(documentRef.nodes.get("#run-story").disabled, true);
+  assert.equal(documentRef.nodes.get("#run-story-mobile").disabled, true);
+  await boot(documentRef);
+  assert.equal(documentRef.nodes.get("#run-story").disabled, false);
+  assert.equal(documentRef.nodes.get("#run-story-mobile").disabled, false);
 });
 
 test("understand_problem safely bootstraps and returns the complete envelope for later typed calls", async () => {
@@ -684,13 +701,22 @@ test("forbidden-operation matrix stays blocked before any local action", async (
 test("the story pauses at the exact preview until a separate button click", async () => {
   const documentRef = makeFakeDocument({ withWebMcp: true });
   const app = await boot(documentRef);
+  assert.equal(documentRef.nodes.get("#run-story").disabled, false);
+  assert.equal(documentRef.nodes.get("#run-story-mobile").disabled, false);
   assert.equal(app.registration.registered, true);
   assert.deepEqual(documentRef.registeredTools.map((tool) => tool.name), TOOL_NAMES);
-  await app.runStory();
   const preview = documentRef.nodes.get("#handoff-preview");
   const confirmButton = documentRef.nodes.get("#confirm-handoff");
   const storyStatus = documentRef.nodes.get("#story-status");
   const eventLog = documentRef.nodes.get("#event-log");
+  const storyRun = app.runStory();
+  assert.equal(documentRef.stepNodes.get("understand").dataset.state, "active");
+  assert.equal(storyStatus.dataset.state, "running");
+  await storyRun;
+  assert.equal(documentRef.stepNodes.get("policy").dataset.state, "done");
+  assert.equal(documentRef.nodes.get(".tool-route").dataset.progress, "5");
+  assert.match(documentRef.nodes.get("#tool-progress-status").textContent, /5\/5/);
+  assert.equal(storyStatus.dataset.state, "paused");
   const firstRunSessionId = app.handlers.session.sessionId;
   assert.equal(preview.hidden, false);
   assert.equal(confirmButton.disabled, false);
@@ -725,6 +751,39 @@ test("the story pauses at the exact preview until a separate button click", asyn
   const secondRun = app.runStory();
   assert.notEqual(app.handlers.session.sessionId, firstRunSessionId, "every story run needs a fresh session identity");
   await secondRun;
+});
+
+test("a late handoff result cannot overwrite a newer story run", async () => {
+  const documentRef = makeFakeDocument({ withWebMcp: true });
+  const app = await boot(documentRef);
+  await app.runStory();
+
+  const originalRun = app.registration.run.bind(app.registration);
+  let releaseHandoff;
+  let signalHandoffStarted;
+  const handoffGate = new Promise((resolve) => { releaseHandoff = resolve; });
+  const handoffStarted = new Promise((resolve) => { signalHandoffStarted = resolve; });
+  app.registration.run = async (name, input, context) => {
+    if (name === "request_handoff") {
+      signalHandoffStarted();
+      await handoffGate;
+    }
+    return originalRun(name, input, context);
+  };
+
+  documentRef.nodes.get("#confirm-handoff").listeners.get("click")();
+  await handoffStarted;
+  const newerStory = app.runStory();
+  const newerSessionId = app.handlers.session.sessionId;
+  releaseHandoff();
+  await new Promise((resolve) => setTimeout(resolve, 0));
+
+  const storyStatus = documentRef.nodes.get("#story-status");
+  assert.equal(app.handlers.session.sessionId, newerSessionId);
+  assert.equal(storyStatus.dataset.state, "running");
+  assert.doesNotMatch(storyStatus.textContent, /Story complete|Story stopped/);
+  await newerStory;
+  assert.equal(storyStatus.dataset.state, "paused");
 });
 
 test("Japanese evaluation view localizes the UI while preserving the same WebMCP tools and human gate", async () => {

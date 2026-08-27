@@ -1,15 +1,16 @@
 import {
   ALLOWED_HANDOFF_CHANNEL,
   createTextResult,
-} from "./contracts.js?v=20260827c";
-import { createSession, sessionEnvelope } from "./session.js?v=20260827c";
-import { confirmHandoff, createDomainHandlers } from "./tools.js?v=20260827c";
-import { registerWebMcpTools } from "./webmcp.js?v=20260827c";
+} from "./contracts.js?v=20260827d";
+import { createSession, sessionEnvelope } from "./session.js?v=20260827d";
+import { confirmHandoff, createDomainHandlers } from "./tools.js?v=20260827d";
+import { registerWebMcpTools } from "./webmcp.js?v=20260827d";
 
 const UI_COPY = Object.freeze({
   en: Object.freeze({
     connected: (count) => `WebMCP connected · ${count} tools ready`,
     unavailable: "WebMCP unavailable · local rehearsal ready",
+    start: "Show me the safe path",
     checking: "Checking the safe path…",
     confirm: "Confirm this local draft",
     waiting: "Waiting",
@@ -17,17 +18,28 @@ const UI_COPY = Object.freeze({
     done: "Done",
     untrusted: "Untrusted",
     policyChecking: "Checking",
+    policyApplied: "Policy applied",
     blocked: "Blocked",
     viewOnly: "View-only",
     drafted: "Drafted",
     confirming: "Confirming",
     draftOnly: "Draft only",
-    listen: "1/6 · Listening to what feels wrong…",
-    evidence: "2/6 · Looking only at what is already visible…",
-    policy: "3/6 · Asking policy whether the urgent action may continue…",
-    safe: "4/6 · Keeping one view-only, reversible step…",
-    brief: "5/6 · Making a calm summary for someone you trust…",
-    review: "6/6 · Review the exact draft; nothing has been sent.",
+    listen: "1/5 · Listening to what feels wrong…",
+    evidence: "2/5 · Looking only at what is already visible…",
+    policy: "3/5 · Asking policy whether the urgent action may continue…",
+    safe: "3/5 · Policy stopped the risk; keeping one view-only step…",
+    brief: "4/5 · Making a calm summary for someone you trust…",
+    review: "5/5 · Review the exact draft; nothing has been sent.",
+    progress: Object.freeze({
+      ready: "Watch each tool move",
+      understand: "1/5 · Understanding",
+      evidence: "2/5 · Checking evidence",
+      policy: "3/5 · Applying policy",
+      brief: "4/5 · Drafting the brief",
+      handoff: "5/5 · Waiting for you",
+      complete: "5/5 · Local draft confirmed",
+      stopped: "Stopped safely",
+    }),
     missingBrief: "Story stopped safely · no brief was available.",
     paused: "Story paused safely · review the exact destination and brief, then choose the explicit button below.",
     again: "Run the relay again",
@@ -70,6 +82,7 @@ const UI_COPY = Object.freeze({
   ja: Object.freeze({
     connected: (count) => `WebMCP接続済み・${count}つの道具を利用できます`,
     unavailable: "WebMCPは利用できません・この端末で練習できます",
+    start: "安心できる道を見てみる",
     checking: "安心できる道を確かめています…",
     confirm: "この下書き内容を確認する",
     waiting: "待機中",
@@ -77,17 +90,28 @@ const UI_COPY = Object.freeze({
     done: "確認済み",
     untrusted: "信用せずに確認",
     policyChecking: "ルール確認中",
+    policyApplied: "安全ルール適用済み",
     blocked: "安全ルールで停止",
     viewOnly: "見るだけ",
     drafted: "下書き済み",
     confirming: "人の確認待ち",
     draftOnly: "下書きのみ",
-    listen: "1/6・気になったことを整理しています…",
-    evidence: "2/6・今見えているものだけを確認しています…",
-    policy: "3/6・急いで操作してよいか、安全ルールで確かめています…",
-    safe: "4/6・元に戻せる「見るだけ」の手順を選んでいます…",
-    brief: "5/6・信頼できる人に見せる相談メモを作っています…",
-    review: "6/6・下書きを確認してください。まだ誰にも送っていません。",
+    listen: "1/5・まず、気になったことを整理しています…",
+    evidence: "2/5・今見えているものだけを確認しています…",
+    policy: "3/5・急いで操作してよいか、安全ルールで確かめています…",
+    safe: "3/5・危険な操作を止め、「見るだけ」の手順を選んでいます…",
+    brief: "4/5・信頼できる人に見せる相談メモを作っています…",
+    review: "5/5・下書きを確認してください。まだ誰にも送っていません。",
+    progress: Object.freeze({
+      ready: "順番に光って進みます",
+      understand: "1/5・困りごとを整理中",
+      evidence: "2/5・見えているものを確認中",
+      policy: "3/5・安全ルールを適用中",
+      brief: "4/5・相談メモを作成中",
+      handoff: "5/5・あなたの確認待ち",
+      complete: "5/5・下書き確認済み",
+      stopped: "安全に停止しました",
+    }),
     missingBrief: "相談メモを作れなかったため、安全に停止しました。",
     paused: "安全に一時停止しました。相手と内容を確かめてから、下の確認ボタンを押してください。",
     again: "もう一度見る",
@@ -230,6 +254,9 @@ export async function boot(documentRef = globalThis.document) {
   const runButton = documentRef.querySelector("#run-story");
   const mobileRunButton = documentRef.querySelector("#run-story-mobile");
   const storyStatus = documentRef.querySelector("#story-status");
+  const mobileStoryStatus = documentRef.querySelector("#mobile-story-status");
+  const toolProgress = documentRef.querySelector(".tool-route");
+  const toolProgressStatus = documentRef.querySelector("#tool-progress-status");
   const problemForm = documentRef.querySelector("#problem-form");
   const problemInput = documentRef.querySelector("#problem-input");
   const humanStatus = documentRef.querySelector("#human-status");
@@ -251,6 +278,14 @@ export async function boot(documentRef = globalThis.document) {
     return result;
   }
 
+  async function invokeWithVisibleProgress(toolName, extra, label, minimumMilliseconds = 420) {
+    const [result] = await Promise.all([
+      invoke(toolName, extra, label),
+      sleep(minimumMilliseconds),
+    ]);
+    return result;
+  }
+
   function mark(name, state, label) {
     setStepState(documentRef, name, state, label);
     if (relayStage && state === "active") relayStage.dataset.phase = name;
@@ -260,15 +295,36 @@ export async function boot(documentRef = globalThis.document) {
     for (const button of [runButton, mobileRunButton]) {
       if (!button) continue;
       button.disabled = disabled;
+      button.dataset.running = String(disabled);
+      button.ariaBusy = String(disabled);
       const labelNode = button.querySelector?.(".button-label");
       if (labelNode) labelNode.textContent = label;
       else button.textContent = label;
     }
   }
 
+  function updateStoryState(state) {
+    if (relayStage) relayStage.dataset.storyState = state;
+    for (const status of [storyStatus, mobileStoryStatus]) {
+      if (status) status.dataset.state = state;
+    }
+  }
+
+  function updateProgress(step, label, state = "running") {
+    if (toolProgress) toolProgress.dataset.progress = String(step);
+    if (toolProgressStatus) {
+      toolProgressStatus.textContent = label;
+      toolProgressStatus.dataset.state = state;
+    }
+  }
+
+  updateRunButtons(copy.start, false);
+
   async function runStory() {
-    if (!runButton) return;
+    if (!runButton && !mobileRunButton) return;
     updateRunButtons(copy.checking, true);
+    updateStoryState("running");
+    updateProgress(0, copy.progress.ready, "running");
     if (relayStage) relayStage.dataset.phase = "ready";
     pendingHandoff = null;
     if (handoffPreview) handoffPreview.hidden = true;
@@ -286,66 +342,70 @@ export async function boot(documentRef = globalThis.document) {
       log.textContent = "";
       log.hidden = true;
     }
-    for (const name of ["understand", "evidence", "blocked", "safe", "brief", "handoff"]) {
+    for (const name of ["understand", "evidence", "policy", "blocked", "safe", "brief", "handoff"]) {
       mark(name, "pending", copy.waiting);
     }
 
     try {
       mark("understand", "active", copy.running);
+      updateProgress(1, copy.progress.understand);
       setStatus(documentRef, "#story-status", copy.listen);
-      const understood = await invoke(
+      const understood = await invokeWithVisibleProgress(
         "understand_problem",
         { userStatement: copy.story.statement },
         copy.labels.understand,
       );
       mark("understand", statusForResult(understood) === "problem-understood" ? "done" : "blocked", copy.done);
-      await sleep(220);
 
       mark("evidence", "active", copy.running);
+      updateProgress(2, copy.progress.evidence);
       setStatus(documentRef, "#story-status", copy.evidence);
-      const evidence = await invoke("collect_evidence", makeStoryEvidence(copy), copy.labels.evidence);
+      const evidence = await invokeWithVisibleProgress("collect_evidence", makeStoryEvidence(copy), copy.labels.evidence);
       mark("evidence", statusForResult(evidence) === "evidence-captured" ? "done" : "blocked", copy.untrusted);
-      await sleep(220);
 
+      mark("policy", "active", copy.policyChecking);
       mark("blocked", "active", copy.policyChecking);
+      updateProgress(3, copy.progress.policy);
       setStatus(documentRef, "#story-status", copy.policy);
-      const blocked = await invoke(
+      const blocked = await invokeWithVisibleProgress(
         "propose_safe_step",
         { stepId: "open_suspicious_link", target: "hxxps://suspicious.invalid/verify" },
         copy.labels.unsafe,
       );
       mark("blocked", statusForResult(blocked) === "blocked" ? "blocked" : "done", copy.blocked);
-      await sleep(220);
 
       mark("safe", "active", copy.running);
       setStatus(documentRef, "#story-status", copy.safe);
-      const safe = await invoke(
+      const safe = await invokeWithVisibleProgress(
         "propose_safe_step",
         { stepId: "review_visible_context", target: "current-context" },
         copy.labels.safe,
       );
       mark("safe", statusForResult(safe) === "safe-step-offered" ? "done" : "blocked", copy.viewOnly);
-      await sleep(220);
+      mark("policy", "done", copy.policyApplied);
 
       mark("brief", "active", copy.running);
+      updateProgress(4, copy.progress.brief);
       setStatus(documentRef, "#story-status", copy.brief);
-      const briefResult = await invoke(
+      const briefResult = await invokeWithVisibleProgress(
         "prepare_trusted_brief",
         { helperLabel: copy.story.helper },
         copy.labels.brief,
       );
       mark("brief", statusForResult(briefResult) === "brief-prepared" ? "done" : "blocked", copy.drafted);
-      await sleep(220);
 
-      mark("handoff", "active", copy.confirming);
-      setStatus(documentRef, "#story-status", copy.review);
       const destination = { label: copy.story.helper, channel: ALLOWED_HANDOFF_CHANNEL };
       const payload = handlers.session.brief?.payload;
       if (!payload) {
         mark("handoff", "blocked", copy.blocked);
+        updateStoryState("blocked");
+        updateProgress(4, copy.progress.stopped, "blocked");
         setStatus(documentRef, "#story-status", copy.missingBrief);
         return;
       }
+      mark("handoff", "active", copy.confirming);
+      updateProgress(5, copy.progress.handoff, "paused");
+      setStatus(documentRef, "#story-status", copy.review);
       pendingHandoff = { destination, payload };
       if (handoffDestination) {
         handoffDestination.textContent = copy.destination(destination.label, destination.channel);
@@ -360,6 +420,7 @@ export async function boot(documentRef = globalThis.document) {
         "#story-status",
         copy.paused,
       );
+      updateStoryState("paused");
     } finally {
       updateRunButtons(copy.again, false);
     }
@@ -391,14 +452,18 @@ export async function boot(documentRef = globalThis.document) {
     );
     if (!humanReceipt) {
       mark("handoff", "blocked", copy.blocked);
+      updateStoryState("blocked");
+      updateProgress(5, copy.progress.stopped, "blocked");
       setStatus(documentRef, "#story-status", copy.noReceipt);
       return;
     }
+    const confirmedSessionId = handlers.session.sessionId;
     void invoke(
       "request_handoff",
       { ...sessionEnvelope(handlers.session), destination, payload, confirmation: humanReceipt },
       copy.labels.handoff,
     ).then((handedOff) => {
+      if (handlers.session.sessionId !== confirmedSessionId) return;
       const handoffOkay = statusForResult(handedOff) === "handoff-prepared";
       mark("handoff", handoffOkay ? "done" : "blocked", handoffOkay ? copy.draftOnly : copy.blocked);
       setStatus(
@@ -410,6 +475,11 @@ export async function boot(documentRef = globalThis.document) {
         pendingHandoff = null;
         if (confirmButton) confirmButton.textContent = copy.confirmed;
         if (relayStage) relayStage.dataset.phase = "complete";
+        updateStoryState("complete");
+        updateProgress(5, copy.progress.complete, "complete");
+      } else {
+        updateStoryState("blocked");
+        updateProgress(5, copy.progress.stopped, "blocked");
       }
     });
   });
