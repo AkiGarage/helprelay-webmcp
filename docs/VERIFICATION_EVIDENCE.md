@@ -1,6 +1,6 @@
 # Verification evidence
 
-Recorded on 2026-08-26 against the public competition repository and live GitHub Pages deployment.
+Recorded from 2026-08-26 through 2026-08-27 against the public competition repository, local submission-quality revision, and live GitHub Pages deployment.
 
 ## Public artifact
 
@@ -46,6 +46,18 @@ This verifies real registration and execution in the recorded environment, not o
 - One separate click completed the local draft and disabled the receipt.
 - Final status: `Story complete · the trusted brief is ready for review, and nothing was sent.`
 - At 1280×720 and 390×844: no horizontal overflow, one `h1`, no unlabeled buttons, and a 64px minimum button height.
+
+## Submission-quality UI revision
+
+The `codex/submission-quality-ui` revision was visually exercised in the Codex in-app browser before publication:
+
+- At a 1920×1080 viewport, the complete three-part relay remained above the fold: the synthetic problem, coral policy stop, jade view-only step, exact five tool names, Trusted Brief preview, and separate human confirmation.
+- At 390×844, the primary story action appeared in the first viewport, the relay became a single vertical path, and all interactive controls remained at least 54px tall without horizontal overflow.
+- Body copy rendered at 17px with a 1.6 line height; controls used visible keyboard focus rings and plain-language labels.
+- With `prefers-reduced-motion: reduce`, relay transitions and brief animations resolved to effectively zero duration and smooth scrolling was disabled.
+- The browser WebMCP capability exposed exactly the five expected tools. A typed `understand_problem` call returned `problem-understood`; the visible story then stopped the unsafe path, offered the allowlisted view-only path, prepared the local brief, and paused before handoff.
+- A separate human click produced a local draft confirmation while the interface continued to state `Nothing has been sent`.
+- Visual evidence: `docs/assets/helprelay-safe-relay-desktop.png` and `docs/assets/helprelay-safe-relay-mobile.png`.
 
 ## Local executable evidence
 

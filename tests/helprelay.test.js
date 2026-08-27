@@ -45,6 +45,7 @@ function makeFakeDocument({ withWebMcp = false } = {}) {
     ...extra,
   });
   const runButton = makeNode();
+  const mobileRunButton = makeNode();
   const confirmButton = makeNode();
   const eventLog = makeNode({ scrollHeight: 0, scrollTop: 0 });
   const stepNodes = new Map();
@@ -54,12 +55,14 @@ function makeFakeDocument({ withWebMcp = false } = {}) {
   }
   for (const [selector, node] of [
     ["#run-story", runButton],
+    ["#run-story-mobile", mobileRunButton],
     ["#confirm-handoff", confirmButton],
     ["#event-log", eventLog],
     ["#handoff-preview", makeNode({ hidden: true })],
     ["#handoff-destination", makeNode()],
     ["#handoff-payload", makeNode()],
     ["#story-status", makeNode()],
+    ["#mobile-story-status", makeNode()],
     ["#webmcp-status", makeNode()],
     ["#human-status", makeNode()],
   ]) {
@@ -691,9 +694,16 @@ test("the story pauses at the exact preview until a separate button click", asyn
   assert.equal(preview.hidden, false);
   assert.equal(confirmButton.disabled, false);
   assert.equal(app.handlers.session.handoff, null);
-  assert.match(documentRef.nodes.get("#handoff-destination").textContent, /A trusted helper/);
-  assert.match(documentRef.nodes.get("#handoff-payload").textContent, /facts/);
+  assert.equal(
+    documentRef.nodes.get("#handoff-destination").textContent,
+    "A trusted helper\nChannel: trusted-helper-draft\nLocal draft · not notified",
+  );
+  for (const heading of ["facts", "what may be happening", "what is still unknown", "safe attempts"]) {
+    assert.match(documentRef.nodes.get("#handoff-payload").textContent, new RegExp(heading));
+  }
   assert.match(storyStatus.textContent, /paused safely/);
+  assert.equal(documentRef.nodes.get("#mobile-story-status").textContent, storyStatus.textContent);
+  assert.equal(typeof documentRef.nodes.get("#run-story-mobile").listeners.get("click"), "function");
   assert.equal(eventLog.textContent.includes("Confirmed draft"), false);
   assert.deepEqual(documentRef.executedToolNames, [
     "understand_problem",

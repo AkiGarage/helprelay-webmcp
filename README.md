@@ -1,6 +1,6 @@
 # HelpRelay
 
-HelpRelay is a small, dependency-free WebMCP Challenge prototype for a common browser moment: a person sees a frightening message, a browser agent can be tempted to guess, and a trusted person may eventually need a concise handoff.
+HelpRelay is a dependency-free WebMCP Challenge app for a common browser moment: a person sees a frightening message, a browser agent can be tempted to guess, and a trusted person may eventually need a concise handoff.
 
 The product keeps the human interface primary. Each screen asks for one decision, uses large controls, shows the current state, and keeps external effects behind a separate confirmation. The two valid outcomes are:
 
@@ -9,12 +9,16 @@ The product keeps the human interface primary. Each screen asks for one decision
 
 HelpRelay does not claim that guidance is guaranteed safe. Browser text, model prose, links, and user-provided wording are untrusted inputs. An independent deterministic policy validates the closed tool envelope, current session/revision/evidence generation and digest, allowlists, and risk signals before a handler can change local demo state.
 
+![The Safe Relay desktop interface](docs/assets/helprelay-safe-relay-desktop.png)
+
+The submission-quality interface is called **The Safe Relay**. It makes the complete collaboration legible as one route: a person's confusing browser moment enters the independent policy gate, the unsafe action stops in coral, one view-only path continues in jade, and a Trusted Brief remains local until a separate human confirmation.
+
 ## What is here
 
 - Five imperative WebMCP tools registered through `document.modelContext.registerTool(...)`:
   `understand_problem`, `collect_evidence`, `propose_safe_step`,
   `prepare_trusted_brief`, and `request_handoff`.
-- A synthetic 15-second story: an urgent prompt-injection banner and suspicious link are captured as untrusted evidence; an unsafe guess is blocked; one safe view-only step is offered; a separated trusted brief is prepared; and the story pauses on an exact destination/payload preview until a separate human confirmation prepares the local draft.
+- A synthetic 15-second story: an urgent prompt-injection banner and suspicious link are captured as untrusted evidence; an unsafe guess is blocked; one safe view-only step is offered; a separated trusted brief is prepared; and the story pauses on a friendly destination/payload preview until a separate human confirmation prepares the local draft.
 - One domain handler used by both surfaces. When WebMCP is present, the human story runs through the exact registered `execute` functions and labels that path in the visible log.
 - No framework, package dependency, API key, analytics, network call, browser storage, or build step.
 - Built-in Node test and static-server scripts only; the public ES module graph carries one explicit artifact version so a returning judge does not mix old and new modules.
@@ -43,7 +47,7 @@ The first `understand_problem` call safely bootstraps a fresh page session from 
 
 ## Verification boundary
 
-Verified on 2026-08-26:
+Core behavior verified on 2026-08-26; submission-quality UI revision verified locally on 2026-08-27:
 
 - 21 executable tests covering one-time session bootstrap, prompt injection, malicious wording, stale state, complete result envelopes, evidence/destination digest collisions, suspicious links, external targets, irreversible requests, malformed envelopes/results, stale/unconfirmed handoff, replay, async registration rejection, and duplicate preparation;
 - registration of all five names against a mocked `registerTool`;
@@ -52,7 +56,9 @@ Verified on 2026-08-26:
 - GitHub Pages serving the checked application artifact over HTTPS;
 - all five tools discovered and called through live WebMCP in Codex's supported in-app browser, including an unsafe-step block and an unconfirmed-handoff block;
 - the human story pausing on the exact preview before a separate confirmation, with nothing sent; and
-- desktop and 390px responsive readbacks with no horizontal overflow, one `h1`, labelled controls, and 64px minimum button height.
+- 1920×1080 and 390×844 responsive readbacks with no horizontal overflow, one `h1`, labelled controls, and an early mobile primary action;
+- the selected desktop/mobile ImageGen concept compared against the final code-native screenshots with the fidelity ledger signed off; and
+- `prefers-reduced-motion: reduce` read back in the supported browser with transitions and animations reduced to `0.01ms` and smooth scrolling disabled.
 
 Not claimed:
 
@@ -60,7 +66,7 @@ Not claimed:
 - screen recording, YouTube publication, Devpost submission, eligibility, or legal review;
 - a guarantee that any guidance is safe in every real-world situation.
 
-See [`docs/VERIFICATION_EVIDENCE.md`](docs/VERIFICATION_EVIDENCE.md), [`docs/JUDGE_GUIDE.md`](docs/JUDGE_GUIDE.md), [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md), and [`docs/ADVERSARIAL_TESTS.md`](docs/ADVERSARIAL_TESTS.md) for the evidence and limits.
+See [`docs/VERIFICATION_EVIDENCE.md`](docs/VERIFICATION_EVIDENCE.md), [`docs/JUDGE_GUIDE.md`](docs/JUDGE_GUIDE.md), [`docs/UI_CONCEPT_SPEC.md`](docs/UI_CONCEPT_SPEC.md), [`docs/UI_FIDELITY_LEDGER.md`](docs/UI_FIDELITY_LEDGER.md), [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md), and [`docs/ADVERSARIAL_TESTS.md`](docs/ADVERSARIAL_TESTS.md) for the evidence and limits.
 
 The judging criteria are equally weighted: **WebMCP Leverage**, **Execution**, **Potential Impact**, and **Creativity & Ambition**. The same listed order is the tie-break priority, so the demo makes the WebMCP advantage visible first.
 

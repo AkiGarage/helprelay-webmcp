@@ -1,10 +1,10 @@
 import {
   ALLOWED_HANDOFF_CHANNEL,
   createTextResult,
-} from "./contracts.js?v=20260826b";
-import { createSession, sessionEnvelope } from "./session.js?v=20260826b";
-import { confirmHandoff, createDomainHandlers } from "./tools.js?v=20260826b";
-import { registerWebMcpTools } from "./webmcp.js?v=20260826b";
+} from "./contracts.js?v=20260827a";
+import { createSession, sessionEnvelope } from "./session.js?v=20260827a";
+import { confirmHandoff, createDomainHandlers } from "./tools.js?v=20260827a";
+import { registerWebMcpTools } from "./webmcp.js?v=20260827a";
 
 function sleep(milliseconds) {
   return new Promise((resolve) => setTimeout(resolve, milliseconds));
@@ -49,10 +49,27 @@ function appendLog(documentRef, label, result) {
 function setStatus(documentRef, selector, message) {
   const node = documentRef.querySelector(selector);
   if (node) node.textContent = message;
+  if (selector === "#story-status") {
+    const mobileNode = documentRef.querySelector("#mobile-story-status");
+    if (mobileNode) mobileNode.textContent = message;
+  }
 }
 
 function statusForResult(result) {
   return result?.structuredContent?.status ?? "unknown";
+}
+
+function formatTrustedBrief(payload) {
+  const sections = [
+    ["facts", payload?.facts],
+    ["what may be happening", payload?.interpretations],
+    ["what is still unknown", payload?.uncertainty],
+    ["safe attempts", payload?.attempts],
+  ];
+  return sections
+    .filter(([, items]) => Array.isArray(items) && items.length > 0)
+    .map(([label, items]) => `${label}\n${items.map((item) => `• ${item}`).join("\n")}`)
+    .join("\n\n");
 }
 
 export async function boot(documentRef = globalThis.document) {
@@ -64,10 +81,12 @@ export async function boot(documentRef = globalThis.document) {
   if (webmcpStatus) {
     webmcpStatus.textContent = registration.registered
       ? `WebMCP connected · ${registration.names.length} tools ready`
-      : "WebMCP unavailable · the local rehearsal is still ready";
+      : "WebMCP unavailable · local rehearsal ready";
+    webmcpStatus.dataset.connected = String(registration.registered);
   }
 
   const runButton = documentRef.querySelector("#run-story");
+  const mobileRunButton = documentRef.querySelector("#run-story-mobile");
   const storyStatus = documentRef.querySelector("#story-status");
   const problemForm = documentRef.querySelector("#problem-form");
   const problemInput = documentRef.querySelector("#problem-input");
@@ -76,6 +95,8 @@ export async function boot(documentRef = globalThis.document) {
   const handoffDestination = documentRef.querySelector("#handoff-destination");
   const handoffPayload = documentRef.querySelector("#handoff-payload");
   const confirmButton = documentRef.querySelector("#confirm-handoff");
+  const helperPlaceholder = documentRef.querySelector("#helper-preview-placeholder");
+  const relayStage = documentRef.querySelector("#relay-stage");
   let pendingHandoff = null;
 
   async function invoke(toolName, extra, label = toolName) {
@@ -89,16 +110,32 @@ export async function boot(documentRef = globalThis.document) {
 
   function mark(name, state, label) {
     setStepState(documentRef, name, state, label);
+    if (relayStage && state === "active") relayStage.dataset.phase = name;
+  }
+
+  function updateRunButtons(label, disabled) {
+    for (const button of [runButton, mobileRunButton]) {
+      if (!button) continue;
+      button.disabled = disabled;
+      const labelNode = button.querySelector?.(".button-label");
+      if (labelNode) labelNode.textContent = label;
+      else button.textContent = label;
+    }
   }
 
   async function runStory() {
     if (!runButton) return;
-    runButton.disabled = true;
+    updateRunButtons("Checking the safe path…", true);
+    if (relayStage) relayStage.dataset.phase = "ready";
     pendingHandoff = null;
     if (handoffPreview) handoffPreview.hidden = true;
+    if (helperPlaceholder) helperPlaceholder.hidden = false;
     if (handoffDestination) handoffDestination.textContent = "";
     if (handoffPayload) handoffPayload.textContent = "";
-    if (confirmButton) confirmButton.disabled = true;
+    if (confirmButton) {
+      confirmButton.disabled = true;
+      confirmButton.textContent = "Confirm this local draft";
+    }
     const fresh = createSession();
     replaceSessionContents(handlers.session, fresh);
     const log = documentRef.querySelector("#event-log");
@@ -112,7 +149,7 @@ export async function boot(documentRef = globalThis.document) {
 
     try {
       mark("understand", "active", "Running");
-      setStatus(documentRef, "#story-status", "1/6 · Listening to the person's concern…");
+      setStatus(documentRef, "#story-status", "1/6 · Listening to what feels wrong…");
       const understood = await invoke(
         "understand_problem",
         { userStatement: "A scary browser banner tells me to click a suspicious link now." },
@@ -122,13 +159,13 @@ export async function boot(documentRef = globalThis.document) {
       await sleep(220);
 
       mark("evidence", "active", "Running");
-      setStatus(documentRef, "#story-status", "2/6 · Capturing only what is visible…");
+      setStatus(documentRef, "#story-status", "2/6 · Looking only at what is already visible…");
       const evidence = await invoke("collect_evidence", makeStoryEvidence(), "Collect evidence");
       mark("evidence", statusForResult(evidence) === "evidence-captured" ? "done" : "blocked", "Untrusted");
       await sleep(220);
 
       mark("blocked", "active", "Checking");
-      setStatus(documentRef, "#story-status", "3/6 · Testing the tempting guess against policy…");
+      setStatus(documentRef, "#story-status", "3/6 · Asking policy whether the urgent action may continue…");
       const blocked = await invoke(
         "propose_safe_step",
         { stepId: "open_suspicious_link", target: "hxxps://suspicious.invalid/verify" },
@@ -138,7 +175,7 @@ export async function boot(documentRef = globalThis.document) {
       await sleep(220);
 
       mark("safe", "active", "Running");
-      setStatus(documentRef, "#story-status", "4/6 · Offering one view-only, reversible step…");
+      setStatus(documentRef, "#story-status", "4/6 · Keeping one view-only, reversible step…");
       const safe = await invoke(
         "propose_safe_step",
         { stepId: "review_visible_context", target: "current-context" },
@@ -148,7 +185,7 @@ export async function boot(documentRef = globalThis.document) {
       await sleep(220);
 
       mark("brief", "active", "Running");
-      setStatus(documentRef, "#story-status", "5/6 · Preparing a separated trusted brief…");
+      setStatus(documentRef, "#story-status", "5/6 · Making a calm summary for someone you trust…");
       const briefResult = await invoke(
         "prepare_trusted_brief",
         { helperLabel: "A trusted helper" },
@@ -167,8 +204,11 @@ export async function boot(documentRef = globalThis.document) {
         return;
       }
       pendingHandoff = { destination, payload };
-      if (handoffDestination) handoffDestination.textContent = JSON.stringify(destination, null, 2);
-      if (handoffPayload) handoffPayload.textContent = JSON.stringify(payload, null, 2);
+      if (handoffDestination) {
+        handoffDestination.textContent = `${destination.label}\nChannel: ${destination.channel}\nLocal draft · not notified`;
+      }
+      if (handoffPayload) handoffPayload.textContent = formatTrustedBrief(payload);
+      if (helperPlaceholder) helperPlaceholder.hidden = true;
       if (handoffPreview) handoffPreview.hidden = false;
       if (confirmButton) confirmButton.disabled = false;
       setStatus(
@@ -177,11 +217,15 @@ export async function boot(documentRef = globalThis.document) {
         "Story paused safely · review the exact destination and brief, then choose the explicit button below.",
       );
     } finally {
-      runButton.disabled = false;
+      updateRunButtons("Run the relay again", false);
     }
   }
 
   runButton?.addEventListener("click", () => {
+    void runStory();
+  });
+
+  mobileRunButton?.addEventListener("click", () => {
     void runStory();
   });
 
@@ -220,7 +264,11 @@ export async function boot(documentRef = globalThis.document) {
           ? "Story complete · the trusted brief is ready for review, and nothing was sent."
           : "Story stopped safely · review the blocked step above.",
       );
-      if (handoffOkay) pendingHandoff = null;
+      if (handoffOkay) {
+        pendingHandoff = null;
+        if (confirmButton) confirmButton.textContent = "Confirmed — draft only";
+        if (relayStage) relayStage.dataset.phase = "complete";
+      }
     });
   });
 

@@ -3,97 +3,207 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="theme-color" content="#0b1220">
-    <meta name="description" content="HelpRelay is a safe WebMCP collaboration between a person, a browser agent, and a trusted helper.">
-    <title>HelpRelay — safe browser-agent collaboration</title>
-    <link rel="stylesheet" href="./styles.css">
+    <meta name="theme-color" content="#ffffff">
+    <meta name="description" content="HelpRelay is a warm, safety-checked relay between a person, a browser agent, and a trusted helper.">
+    <title>HelpRelay — one safe next step</title>
+    <link rel="stylesheet" href="./styles.css?v=20260827a">
   </head>
   <body>
     <header class="site-header">
-      <div class="shell header-inner">
-        <a class="wordmark" href="#main-content" aria-label="HelpRelay home">HelpRelay</a>
-        <span class="header-note">A calm path when a browser moment feels risky</span>
+      <div class="shell topbar">
+        <a class="wordmark" href="#main-content" aria-label="HelpRelay home">
+          <svg class="wordmark-mark" viewBox="0 0 44 28" aria-hidden="true">
+            <path d="M5 14h13c5.5 0 5.5-8 11-8h10"></path>
+            <path d="M18 14c5.5 0 5.5 8 11 8h10"></path>
+            <circle cx="5" cy="14" r="3"></circle>
+            <circle cx="39" cy="6" r="3"></circle>
+            <circle cx="39" cy="22" r="3"></circle>
+          </svg>
+          <span>HelpRelay</span>
+        </a>
+        <p class="topbar-promise">A calm path when something online feels wrong</p>
+        <span id="webmcp-status" class="connection-status" role="status">Checking WebMCP connection…</span>
       </div>
     </header>
 
-    <main id="main-content" class="shell" tabindex="-1">
-      <section class="hero" aria-labelledby="hero-title">
-        <p class="eyebrow">WebMCP Challenge · safety-first demo</p>
-        <h1 id="hero-title">Pause. Understand. Choose one safe next step.</h1>
-        <p class="hero-copy">
-          HelpRelay helps a person and a browser agent work together without guessing. If the moment is still confusing, a trusted helper receives a clear draft — never an automatic message.
-        </p>
-        <div class="hero-actions">
-          <button id="run-story" class="button button-primary" type="button">Run the 15-second story</button>
-          <span id="webmcp-status" class="connection-status" role="status">Checking WebMCP availability…</span>
-        </div>
-      </section>
-
-      <section class="comparison" aria-labelledby="comparison-title">
-        <div class="section-heading">
-          <p class="eyebrow">The choice that matters</p>
-          <h2 id="comparison-title">Unsafe guessing vs. a policy-blocked path</h2>
-        </div>
-        <div class="comparison-grid">
-          <article class="choice-card choice-card-danger">
-            <div class="choice-topline"><span class="status-dot danger"></span><span class="tag tag-danger">Unsafe guess</span></div>
-            <h3>“Click the urgent link”</h3>
-            <p>A scary page can sound convincing. HelpRelay treats that wording as untrusted and refuses to open it.</p>
-            <p class="choice-result">Blocked before any external effect</p>
-          </article>
-          <article class="choice-card choice-card-safe">
-            <div class="choice-topline"><span class="status-dot safe"></span><span class="tag tag-safe">WebMCP path</span></div>
-            <h3>“Review visible context”</h3>
-            <p>The person sees one clear, reversible option. Nothing opens, changes, sends, or asks for credentials.</p>
-            <p class="choice-result">One allowlisted view-only step</p>
-          </article>
-        </div>
-      </section>
-
-      <section class="story-panel" aria-labelledby="story-title">
-        <div class="section-heading">
-          <p class="eyebrow">See the boundary in action</p>
-          <h2 id="story-title">A synthetic 15-second browser story</h2>
-          <p>All story data is fictional and stays in this page. Watch each decision appear below.</p>
-        </div>
-        <ol id="story-steps" class="story-steps" aria-label="Demo story steps">
-          <li data-step="understand" data-state="pending"><span class="step-marker">1</span><span><strong>Understand</strong><small>Hear what feels wrong</small></span><span class="step-state">Waiting</span></li>
-          <li data-step="evidence" data-state="pending"><span class="step-marker">2</span><span><strong>Collect</strong><small>Keep page text untrusted</small></span><span class="step-state">Waiting</span></li>
-          <li data-step="blocked" data-state="pending"><span class="step-marker">3</span><span><strong>Block</strong><small>Refuse the suspicious action</small></span><span class="step-state">Waiting</span></li>
-          <li data-step="safe" data-state="pending"><span class="step-marker">4</span><span><strong>Offer</strong><small>One view-only step</small></span><span class="step-state">Waiting</span></li>
-          <li data-step="brief" data-state="pending"><span class="step-marker">5</span><span><strong>Prepare</strong><small>Separate the trusted brief</small></span><span class="step-state">Waiting</span></li>
-          <li data-step="handoff" data-state="pending"><span class="step-marker">6</span><span><strong>Confirm</strong><small>Draft only, never sent</small></span><span class="step-state">Waiting</span></li>
-        </ol>
-        <div id="story-status" class="story-status" role="status" aria-live="polite">Ready when you are. The story has no external side effects.</div>
-        <pre id="event-log" class="event-log" aria-label="Demo event log" hidden></pre>
-        <section id="handoff-preview" class="handoff-preview" aria-labelledby="handoff-preview-title" hidden>
-          <p class="eyebrow">Human review required</p>
-          <h3 id="handoff-preview-title">Review the exact local draft</h3>
-          <p class="handoff-copy">The story pauses here. Confirming creates a one-time local receipt and prepares a draft only. It does not send a message or contact anyone.</p>
-          <div class="preview-grid">
-            <div>
-              <h4>Destination</h4>
-              <pre id="handoff-destination" class="preview-value"></pre>
-            </div>
-            <div>
-              <h4>Brief payload</h4>
-              <pre id="handoff-payload" class="preview-value"></pre>
-            </div>
+    <main id="main-content" class="shell app-shell" tabindex="-1">
+      <section class="relay-section" aria-labelledby="relay-title">
+        <div class="relay-intro">
+          <div>
+            <p class="screen-kicker">The Safe Relay</p>
+            <h1 id="relay-title">Let’s pause before you tap.</h1>
           </div>
-          <button id="confirm-handoff" class="button button-secondary" type="button" disabled>Confirm this local draft</button>
-        </section>
+          <p>We’ll check what you can see, stop the risky guess, and offer one gentle next step.</p>
+        </div>
+
+        <div class="mobile-start">
+          <button id="run-story-mobile" class="button button-primary" type="button">
+            <span class="button-label">Show me the safe path</span>
+            <span class="button-arrow" aria-hidden="true">→</span>
+          </button>
+          <div id="mobile-story-status" class="story-status" role="status" aria-live="polite">
+            Synthetic story · no external effects
+          </div>
+        </div>
+
+        <div id="relay-stage" class="relay-stage" data-phase="ready">
+          <svg class="relay-map" viewBox="0 0 1320 560" preserveAspectRatio="none" aria-hidden="true">
+            <path class="relay-track" d="M142 264 C285 264 280 136 438 136 S655 264 768 264 S1012 158 1186 158"></path>
+            <path class="relay-flow" d="M142 264 C285 264 280 136 438 136 S655 264 768 264 S1012 158 1186 158"></path>
+            <path class="relay-unsafe" d="M660 262 C700 306 712 351 768 351"></path>
+            <path class="relay-safe" d="M768 264 C919 264 1012 158 1186 158"></path>
+          </svg>
+
+          <article class="relay-person" aria-labelledby="person-title">
+            <div class="scene-heading">
+              <span class="scene-number">1</span>
+              <div>
+                <p>You</p>
+                <h2 id="person-title">Something feels off</h2>
+              </div>
+            </div>
+            <div class="browser-moment" aria-label="Synthetic suspicious browser page">
+              <div class="browser-chrome" aria-hidden="true">
+                <span></span><span></span><span></span>
+                <b>hxxps://suspicious.invalid</b>
+              </div>
+              <div class="browser-message">
+                <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M24 6 5 40h38L24 6Z"></path><path d="M24 18v10"></path><circle cx="24" cy="34" r="1.5"></circle></svg>
+                <div>
+                  <strong>Verify now</strong>
+                  <span>Enter your password to continue.</span>
+                </div>
+              </div>
+              <button class="fake-page-action" type="button" disabled>Continue</button>
+              <p>Fictional page · disabled for this demo</p>
+            </div>
+            <p class="person-thought">“I don’t know whether this is real.”</p>
+          </article>
+
+          <section class="relay-policy" aria-labelledby="policy-title">
+            <div class="scene-heading">
+              <span class="scene-number">2</span>
+              <div>
+                <p>Policy &amp; AI</p>
+                <h2 id="policy-title">HelpRelay checks the boundary</h2>
+              </div>
+            </div>
+            <ol class="tool-route" aria-label="Five WebMCP tools">
+              <li data-step="understand" data-state="pending">
+                <span class="tool-index">01</span>
+                <code>understand_problem</code>
+                <span class="step-state">Ready</span>
+              </li>
+              <li data-step="evidence" data-state="pending">
+                <span class="tool-index">02</span>
+                <code>collect_evidence</code>
+                <span class="step-state">Ready</span>
+              </li>
+              <li class="tool-split">
+                <div class="tool-main">
+                  <span class="tool-index">03</span>
+                  <code>propose_safe_step</code>
+                </div>
+                <div class="policy-branches">
+                  <div class="policy-branch policy-branch-danger" data-step="blocked" data-state="pending">
+                    <span>Open suspicious link</span>
+                    <strong class="step-state">Policy stop</strong>
+                  </div>
+                  <div class="policy-branch policy-branch-safe" data-step="safe" data-state="pending">
+                    <span>Review visible context</span>
+                    <strong class="step-state">View-only</strong>
+                  </div>
+                </div>
+              </li>
+              <li data-step="brief" data-state="pending">
+                <span class="tool-index">04</span>
+                <code>prepare_trusted_brief</code>
+                <span class="step-state">Ready</span>
+              </li>
+              <li data-step="handoff" data-state="pending">
+                <span class="tool-index">05</span>
+                <code>request_handoff</code>
+                <span class="step-state">Human gate</span>
+              </li>
+            </ol>
+            <p class="policy-reassurance"><span aria-hidden="true">✓</span> Page words stay untrusted. Policy decides what may continue.</p>
+          </section>
+
+          <article class="relay-helper" aria-labelledby="helper-title">
+            <div class="scene-heading">
+              <span class="scene-number">3</span>
+              <div>
+                <p>Trusted helper</p>
+                <h2 id="helper-title">Only if you want one</h2>
+              </div>
+            </div>
+            <div class="safe-step-preview">
+              <span class="safe-check" aria-hidden="true">✓</span>
+              <div>
+                <p>One safe next step</p>
+                <strong>Review only what is already visible</strong>
+                <span>No link opens. Nothing changes.</span>
+              </div>
+            </div>
+
+            <div id="helper-preview-placeholder" class="brief-placeholder">
+              <div class="brief-titleline">
+                <span>Trusted Brief</span>
+                <strong>Local draft</strong>
+              </div>
+              <p>Your facts, unknowns, and the safe step will appear here for your review.</p>
+              <div class="brief-lines" aria-hidden="true"><span></span><span></span><span></span></div>
+            </div>
+
+            <section id="handoff-preview" class="handoff-preview" aria-labelledby="handoff-preview-title" hidden>
+              <div class="brief-titleline">
+                <span id="handoff-preview-title">Trusted Brief</span>
+                <strong>Local draft</strong>
+              </div>
+              <div class="preview-block">
+                <h3>Who would review it</h3>
+                <pre id="handoff-destination" class="preview-value"></pre>
+              </div>
+              <div class="preview-block preview-block-scroll">
+                <h3>What they would see</h3>
+                <pre id="handoff-payload" class="preview-value"></pre>
+              </div>
+              <button id="confirm-handoff" class="button button-confirm" type="button" disabled>
+                Confirm this local draft
+              </button>
+              <p class="confirmation-note">This separate confirmation prepares a draft only.</p>
+            </section>
+            <p class="not-sent"><span aria-hidden="true">●</span> Nothing has been sent</p>
+          </article>
+        </div>
+
+        <div class="relay-controls">
+          <button id="run-story" class="button button-primary" type="button">
+            <span class="button-label">Show me the safe path</span>
+            <span class="button-arrow" aria-hidden="true">→</span>
+          </button>
+          <div id="story-status" class="story-status" role="status" aria-live="polite">
+            Ready when you are. This story uses synthetic data and has no external effects.
+          </div>
+        </div>
+
+        <details class="decision-details">
+          <summary>See the WebMCP decision log</summary>
+          <p>These are the real typed tool results used by the relay. They are shown for verification, not required to use the app.</p>
+          <pre id="event-log" class="event-log" aria-label="WebMCP decision log" hidden></pre>
+        </details>
       </section>
 
       <section class="rehearsal" aria-labelledby="rehearsal-title">
-        <div class="section-heading">
-          <p class="eyebrow">Try the human side</p>
-          <h2 id="rehearsal-title">Start with one sentence</h2>
-          <p>Describe what you saw. HelpRelay will only restate it and keep the next decision visible.</p>
+        <div class="rehearsal-copy">
+          <p class="screen-kicker">Try your own words</p>
+          <h2 id="rehearsal-title">What happened?</h2>
+          <p>One sentence is enough. HelpRelay will listen and restate it without taking action.</p>
         </div>
         <form id="problem-form" class="problem-form">
-          <label for="problem-input">What happened?</label>
-          <textarea id="problem-input" name="problem" rows="3" maxlength="1200" placeholder="For example: A page showed a scary message and I am not sure what to do."></textarea>
-          <button class="button button-secondary" type="submit">Understand this problem</button>
+          <label for="problem-input">Tell HelpRelay what you noticed</label>
+          <textarea id="problem-input" name="problem" rows="3" maxlength="1200" placeholder="For example: A page showed a scary message and I’m not sure what to do."></textarea>
+          <button class="button button-secondary" type="submit">Help me understand it</button>
         </form>
         <div id="human-status" class="human-status" role="status" aria-live="polite">No action taken yet.</div>
       </section>
@@ -101,10 +211,10 @@
 
     <footer class="site-footer">
       <div class="shell footer-inner">
-        <p><strong>HelpRelay</strong> is a static, local-first competition prototype.</p>
-        <p>Guidance is bounded and safety-checked, not guaranteed safe. External effects always require a separate human decision.</p>
+        <p><strong>HelpRelay</strong> offers bounded, safety-checked guidance — not guaranteed safety.</p>
+        <p>Synthetic demo · no credentials · no storage · no automatic external action</p>
       </div>
     </footer>
-    <script type="module" src="./src/app.js?v=20260826b"></script>
+    <script type="module" src="./src/app.js?v=20260827a"></script>
   </body>
 </html>
