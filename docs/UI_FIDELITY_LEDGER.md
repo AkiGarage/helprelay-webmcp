@@ -1,42 +1,48 @@
-# UI fidelity ledger — Calm Guided Focus
+# UI fidelity ledger — One Calm Moment
 
 Implementation reference: `docs/UI_CONCEPT_SPEC.md`
+
+Selected visual references:
+
+- `docs/ui-concepts/one-calm-moment-desktop.png`
+- `docs/ui-concepts/one-calm-moment-mobile.png`
 
 ## Concept-to-code comparison
 
 | Concept promise | Implemented evidence | Result |
 | --- | --- | --- |
-| One calm reading order joins the person, policy, and trusted helper | The primary tier pairs the suspicious page with the safety decision; the proof tier pairs the five-tool rail with the local Trusted Brief | Match |
-| The unsafe path visibly stops before any action | Coral `Open suspicious link` branch ends inside `propose_safe_step` and becomes `Blocked` | Match |
-| One safe, reversible path continues | Jade `Review visible context` branch continues to the helper scene and states that no link opens or changes | Match |
-| Five real WebMCP tools remain provable without dominating the consumer UI | All five exact tool names update on the lower execution rail during the registered execution path | Match |
-| Trusted Brief is a preview, not a sent message | The lower-right draft shows exact destination and content, a separate confirmation, and `Nothing has been sent` | Match |
-| Technical evidence stays secondary | The WebMCP event log is collapsed below the single dominant action | Match |
-| Warm, readable, consumer-facing tone | Humanist local type, 17 px body copy, oat reassurance, large controls, plain conversation copy, no dashboard navigation | Match |
-| Mobile becomes a natural vertical relay | At 390 px the route stacks in reading order, adds an early copy of the same primary action, keeps 52 px controls, and has no horizontal overflow | Match |
-| Motion reassures without becoming decoration | Route progress and state transitions use 160–420 ms motion; the reduced-motion query collapses them to `0.01ms` and disables smooth scrolling | Match |
+| One vertical gaze path instead of a dashboard | The opening moves from reassurance, to one primary action, to one enclosed safety scene, to the local brief | Match |
+| Pressing the main action must feel immediate | The label changes to `Checking…` / `安全チェックを進めています…`, the status becomes indigo, and the active tool and progress sentence update within the first rendered step | Match |
+| Unsafe and safe paths are understood without tracing lines | The same policy surface places a coral stopped action beside a jade view-only step; no connector diagram is used | Match |
+| Independent policy is more prominent than AI prose | The policy heading, stopped action, view-only action, and explicit policy reassurance are the foreground of the main scene | Match |
+| Real WebMCP remains provable but does not dominate | A compact disclosure shows the progress sentence and five dots; opening it reveals all five exact registered tool names and their states | Match |
+| Human confirmation is visibly separate from preparation | The Trusted Brief previews destination and content, pauses before `request_handoff`, and enables a separate confirmation button | Match |
+| No external message is implied | The preview heading, confirmation note, completion status, and persistent lock message all say that the result is a local draft and nothing was sent | Match |
+| Large, tactile, readable controls | The primary action is 64–68 px high, confirmation is 58–60 px high, body text is 17–18 px, and press/focus states are explicit | Match |
+| Mobile follows the same calm order | At 390 px the action appears before the scene, safety cards stack, the brief follows as the next visible section, and there is no horizontal overflow | Match |
+| Motion supports state recognition without excluding reduced-motion users | Normal mode uses restrained press, pulse, and state transitions; `prefers-reduced-motion: reduce` resolves tested animations and transitions to `0.00001s` | Match |
 
 ## Intentional deviations
 
-- The selected concept included decorative help controls and lifestyle objects. The implementation omits them so every visible element explains the product or the safety boundary.
-- The concept's approximate tool row is implemented with the five exact registered tool names and real state updates.
-- Mobile exposes the primary action before the long relay, instead of only after it, so a person does not need to discover an action roughly 1,900 px below the opening view.
+- The implementation uses a code-native line-and-heart brand mark instead of the image concept's decorative flourish so it stays sharp without third-party assets.
+- The concept shows policy cards floating over a dimmed browser. The implementation keeps the browser context and policy in one bordered scene on desktop, which preserves readable synthetic evidence and avoids a modal impression.
+- The exact WebMCP tool names are behind a disclosure rather than shown inline at all times. This keeps the consumer path calm while preserving inspectable technical proof.
+- The full Trusted Brief remains available in a bounded, scrollable text area so the confirmation and no-send statement stay in the same 1920×1080 view.
 
 ## Above-the-fold copy diff
 
-Removed from the old opening view:
+Removed from the prior prototype-style opening:
 
-- `WebMCP Challenge · safety-first demo`
-- the long marketing explanation of browser-agent collaboration
-- separate comparison-card headings and repeated descriptions
-- `A synthetic 15-second browser story`
+- challenge and technical-demo framing
+- competing feature cards and numbered workflow blocks
+- repeated explanations before the first action
 
 Replaced with:
 
-- `Let’s pause before you tap.`
-- one sentence describing check → stop → safe step
-- the person's concern, exact five tool names, unsafe stop, safe view-only route, local brief, separate confirmation, and no-send reassurance in one stage
+- `You’re okay. We’ll start with what’s on this screen.`
+- `大丈夫。いま見えている画面から確かめます。`
+- one conversational sentence, one tactile action, and one visible reassurance that the practice flow has no external effect
 
 ## Agency signoff
 
-Desktop 1920×1080 was compared against `desktop-revision-selected.png`; mobile 390×844 was regression-checked in the same visual QA pass. The final desktop has no horizontal overflow or crossing lines and keeps the CTA, unsafe stop, view-only step, five tools, separate confirmation, and no-send state in the first viewport. The remaining differences are intentional code-native simplifications documented above; no unresolved fidelity gap blocks owner review.
+The implemented Japanese view was compared directly with both selected concept images at 1920×1080 and 390×844. Final QA confirmed one dominant entry action, immediate running feedback, a completed third policy step rather than a permanently gray state, visible coral/jade outcomes, five real WebMCP registrations, separate human confirmation, reduced-motion behavior, and no horizontal overflow at 320, 375, 390, 768, or 1920 px. The remaining differences are the intentional code-native simplifications above; no unresolved visual fidelity gap blocks owner review.

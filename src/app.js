@@ -1,17 +1,17 @@
 import {
   ALLOWED_HANDOFF_CHANNEL,
   createTextResult,
-} from "./contracts.js?v=20260827d";
-import { createSession, sessionEnvelope } from "./session.js?v=20260827d";
-import { confirmHandoff, createDomainHandlers } from "./tools.js?v=20260827d";
-import { registerWebMcpTools } from "./webmcp.js?v=20260827d";
+} from "./contracts.js?v=20260828a";
+import { createSession, sessionEnvelope } from "./session.js?v=20260828a";
+import { confirmHandoff, createDomainHandlers } from "./tools.js?v=20260828a";
+import { registerWebMcpTools } from "./webmcp.js?v=20260828a";
 
 const UI_COPY = Object.freeze({
   en: Object.freeze({
-    connected: (count) => `WebMCP connected · ${count} tools ready`,
+    connected: (count) => `Ready · ${count} WebMCP safety checks`,
     unavailable: "WebMCP unavailable · local rehearsal ready",
-    start: "Show me the safe path",
-    checking: "Checking the safe path…",
+    start: "Check it with me",
+    checking: "Checking the screen safely…",
     confirm: "Confirm this local draft",
     waiting: "Waiting",
     running: "Running",
@@ -42,7 +42,7 @@ const UI_COPY = Object.freeze({
     }),
     missingBrief: "Story stopped safely · no brief was available.",
     paused: "Story paused safely · review the exact destination and brief, then choose the explicit button below.",
-    again: "Run the relay again",
+    again: "Check another time",
     destination: (label, channel) => `${label}\nChannel: ${channel}\nLocal draft · not notified`,
     noReceipt: "Story stopped safely · no confirmation receipt was created.",
     complete: "Story complete · the trusted brief is ready for review, and nothing was sent.",
@@ -80,10 +80,10 @@ const UI_COPY = Object.freeze({
     }),
   }),
   ja: Object.freeze({
-    connected: (count) => `WebMCP接続済み・${count}つの道具を利用できます`,
+    connected: (count) => `WebMCP接続済み・${count}つの安全チェック`,
     unavailable: "WebMCPは利用できません・この端末で練習できます",
-    start: "安心できる道を見てみる",
-    checking: "安心できる道を確かめています…",
+    start: "いっしょに確かめる",
+    checking: "安全チェックを進めています…",
     confirm: "この下書き内容を確認する",
     waiting: "待機中",
     running: "確認中",
@@ -114,7 +114,7 @@ const UI_COPY = Object.freeze({
     }),
     missingBrief: "相談メモを作れなかったため、安全に停止しました。",
     paused: "安全に一時停止しました。相手と内容を確かめてから、下の確認ボタンを押してください。",
-    again: "もう一度見る",
+    again: "もう一度確かめる",
     destination: (label, channel) => `${label}\n方法：${channel}\nこの端末だけの下書き・相手への通知なし`,
     noReceipt: "人による確認がなかったため、安全に停止しました。",
     complete: "確認できました。相談メモは下書きのままで、まだ誰にも送っていません。",
@@ -333,7 +333,9 @@ export async function boot(documentRef = globalThis.document) {
     if (handoffPayload) handoffPayload.textContent = "";
     if (confirmButton) {
       confirmButton.disabled = true;
-      confirmButton.textContent = copy.confirm;
+      const confirmLabel = confirmButton.querySelector("span");
+      if (confirmLabel) confirmLabel.textContent = copy.confirm;
+      else confirmButton.textContent = copy.confirm;
     }
     const fresh = createSession();
     replaceSessionContents(handlers.session, fresh);
@@ -473,7 +475,11 @@ export async function boot(documentRef = globalThis.document) {
       );
       if (handoffOkay) {
         pendingHandoff = null;
-        if (confirmButton) confirmButton.textContent = copy.confirmed;
+        if (confirmButton) {
+          const confirmLabel = confirmButton.querySelector("span");
+          if (confirmLabel) confirmLabel.textContent = copy.confirmed;
+          else confirmButton.textContent = copy.confirmed;
+        }
         if (relayStage) relayStage.dataset.phase = "complete";
         updateStoryState("complete");
         updateProgress(5, copy.progress.complete, "complete");
