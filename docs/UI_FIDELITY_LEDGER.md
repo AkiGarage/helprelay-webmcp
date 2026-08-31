@@ -1,48 +1,62 @@
-# UI fidelity ledger — One Calm Moment
+# UI fidelity ledger — Quiet Companion
 
 Implementation reference: `docs/UI_CONCEPT_SPEC.md`
 
-Selected visual references:
+Actual screenshots:
 
-- `docs/ui-concepts/one-calm-moment-desktop.png`
-- `docs/ui-concepts/one-calm-moment-mobile.png`
+- `docs/assets/helprelay-ja-desktop-initial.png`
+- `docs/assets/helprelay-ja-desktop-running.png`
+- `docs/assets/helprelay-ja-desktop.png`
+- `docs/assets/helprelay-ja-mobile-initial.png`
+- `docs/assets/helprelay-ja-mobile-running.png`
+- `docs/assets/helprelay-ja-mobile.png`
+- `docs/assets/helprelay-ja-mobile-handoff-preview.png`
 
 ## Concept-to-code comparison
 
-| Concept promise | Implemented evidence | Result |
-| --- | --- | --- |
-| One vertical gaze path instead of a dashboard | The opening moves from reassurance, to one primary action, to one enclosed safety scene, to the local brief | Match |
-| Pressing the main action must feel immediate | The label changes to `Checking…` / `安全チェックを進めています…`, the status becomes indigo, and the active tool and progress sentence update within the first rendered step | Match |
-| Unsafe and safe paths are understood without tracing lines | The same policy surface places a coral stopped action beside a jade view-only step; no connector diagram is used | Match |
-| Independent policy is more prominent than AI prose | The policy heading, stopped action, view-only action, and explicit policy reassurance are the foreground of the main scene | Match |
-| Real WebMCP remains provable but does not dominate | A compact disclosure shows the progress sentence and five dots; opening it reveals all five exact registered tool names and their states | Match |
-| Human confirmation is visibly separate from preparation | The Trusted Brief previews destination and content, pauses before `request_handoff`, and enables a separate confirmation button | Match |
-| No external message is implied | The preview heading, confirmation note, completion status, and persistent lock message all say that the result is a local draft and nothing was sent | Match |
-| Large, tactile, readable controls | The primary action is 64–68 px high, confirmation is 58–60 px high, body text is 17–18 px, and press/focus states are explicit | Match |
-| Mobile follows the same calm order | At 390 px the action appears before the scene, safety cards stack, the brief follows as the next visible section, and there is no horizontal overflow | Match |
-| Motion supports state recognition without excluding reduced-motion users | Normal mode uses restrained press, pulse, and state transitions; `prefers-reduced-motion: reduce` resolves tested animations and transitions to `0.00001s` | Match |
+| Comparison point | Concept | Implemented result | Verdict |
+| --- | --- | --- | --- |
+| Gaze path | One centered reassurance-to-action path | Headline → three stages → current problem → one button; details remain collapsed | Match |
+| State recognition | Stable surface changes in place | Ready, checking, safe result, brief preparation, and confirmation preview replace the same working surface and scroll into view after a press | Match |
+| Safety contrast | Coral stop beside jade view-only result | Both outcomes use icon, heading, explanatory sentence, and color; the third journey step activates only when a help note is requested | Match |
+| Consumer language | No technology knowledge required | Default Japanese removes visible WebMCP jargon and localizes the help note and event log; exact tool names remain available inside the safety disclosure | Match |
+| Tactile finish | White canvas, deep navy, restrained cobalt, soft depth | Code-native mark, one contact shadow, 61–68 px main controls, clear press/focus states, warm coral and jade surfaces | Match |
 
-## Intentional deviations
+## Copy changes from the rejected UI
 
-- The implementation uses a code-native line-and-heart brand mark instead of the image concept's decorative flourish so it stays sharp without third-party assets.
-- The concept shows policy cards floating over a dimmed browser. The implementation keeps the browser context and policy in one bordered scene on desktop, which preserves readable synthetic evidence and avoids a modal impression.
-- The exact WebMCP tool names are behind a disclosure rather than shown inline at all times. This keeps the consumer path calm while preserving inspectable technical proof.
-- The full Trusted Brief remains available in a bounded, scrollable text area so the confirmation and no-send statement stay in the same 1920×1080 view.
+Removed or moved behind disclosures:
 
-## Above-the-fold copy diff
-
-Removed from the prior prototype-style opening:
-
-- challenge and technical-demo framing
-- competing feature cards and numbered workflow blocks
-- repeated explanations before the first action
+- technical-demo framing and WebMCP terminology in the normal path
+- simultaneous workflow cards, branch lines, and equal-weight choices
+- English prompt-injection text in the Japanese help note
+- progress that completed in about two seconds without a readable current action
 
 Replaced with:
 
-- `You’re okay. We’ll start with what’s on this screen.`
-- `大丈夫。いま見えている画面から確かめます。`
-- one conversational sentence, one tactile action, and one visible reassurance that the practice flow has no external effect
+- `大丈夫。いっしょに確認しましょう。`
+- `画面を変えたり、誰かに送ったりしません。`
+- `この画面を確認する`
+- `まず、何に困っているのか受け止めています…`
+- `危ないかもしれないリンクを止めました。何も開いていません。`
+- a separate `相談メモを作る` decision and a later `この下書き内容を確認する` decision
+
+## Intentional deviations
+
+- The concept uses a more open result canvas. The implementation retains one subtle enclosing surface so ready, running, result, and handoff states do not jump vertically and mobile users keep their place.
+- The implementation adds two short result rows beneath the coral heading. This is more explicit than the concept, but distinguishes “what was stopped” from “what is safe to do” for people who cannot infer meaning from color.
+- The concept uses a decorative logo. The implementation uses a code-native line mark to avoid third-party assets and preserve sharp rendering.
+- Exact tool names and raw structured data are not visible by default. They remain inspectable for judges without imposing developer language on the person seeking help.
+
+## Visual QA evidence
+
+- Browser method: Codex in-app Browser, real page-loaded WebMCP registrations, viewport override at 1920×1080, 390×844, and 320×844.
+- 1920×1080: one primary task surface; checking and result remain fully visible after activation.
+- 390×844: active work automatically moves into view; safe result and handoff preview remain in the same column; no horizontal overflow.
+- 320×844: `scrollWidth === innerWidth`; visible mobile action is 61 px high.
+- Reduced motion: browser-emulated `prefers-reduced-motion: reduce` matched; progress dots and status pulse reported `animation-name: none`, with `scroll-behavior: auto`.
+- WebMCP: the browser reported all five page-defined tools from the local page. The exercised UI path called the real registered executor, stopped at progress 3 before brief creation, paused before `request_handoff`, and recorded `外部には送っていません` only after the separate human confirmation.
+- Regression checks: `npm test` passed 27/27 executable tests, including visible-evidence matching and stale async-result isolation; `npm run check` passed all required-file and module checks.
 
 ## Agency signoff
 
-The implemented Japanese view was compared directly with both selected concept images at 1920×1080 and 390×844. Final QA confirmed one dominant entry action, immediate running feedback, a completed third policy step rather than a permanently gray state, visible coral/jade outcomes, five real WebMCP registrations, separate human confirmation, reduced-motion behavior, and no horizontal overflow at 320, 375, 390, 768, or 1920 px. The remaining differences are the intentional code-native simplifications above; no unresolved visual fidelity gap blocks owner review.
+The implemented Japanese view was compared directly with the selected desktop concept and inspected in the real browser at desktop and mobile sizes. The five concept comparison points above match, and the four differences are intentional human-factors adaptations rather than unfinished fidelity gaps. This revision is at agency-signoff fidelity for Aki’s hands-on review; no unresolved visual defect blocks the live preview.

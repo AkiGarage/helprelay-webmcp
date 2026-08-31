@@ -46,6 +46,7 @@ function makeFakeDocument({ withWebMcp = false, lang = "en" } = {}) {
   });
   const runButton = makeNode({ disabled: true });
   const mobileRunButton = makeNode({ disabled: true });
+  const prepareBriefButton = makeNode({ disabled: true });
   const confirmButton = makeNode();
   const eventLog = makeNode({ scrollHeight: 0, scrollTop: 0 });
   const stepNodes = new Map();
@@ -56,11 +57,15 @@ function makeFakeDocument({ withWebMcp = false, lang = "en" } = {}) {
   for (const [selector, node] of [
     ["#run-story", runButton],
     ["#run-story-mobile", mobileRunButton],
+    ["#prepare-brief", prepareBriefButton],
+    ["#finish-here", makeNode()],
     ["#confirm-handoff", confirmButton],
     ["#event-log", eventLog],
     ["#handoff-preview", makeNode({ hidden: true })],
     ["#handoff-destination", makeNode()],
     ["#handoff-payload", makeNode()],
+    ["#handoff-raw-payload", makeNode()],
+    ["#helper-preview-placeholder", makeNode()],
     ["#story-status", makeNode()],
     ["#mobile-story-status", makeNode()],
     ["#tool-progress-status", makeNode()],
@@ -181,6 +186,7 @@ test("story buttons stay disabled in static HTML until boot finishes WebMCP regi
     const html = await readFile(new URL(relativePath, import.meta.url), "utf8");
     assert.match(html, /<button id="run-story"[^>]*\sdisabled>/);
     assert.match(html, /<button id="run-story-mobile"[^>]*\sdisabled>/);
+    assert.match(html, /<button id="prepare-brief"[^>]*\sdisabled>/);
   }
 
   const documentRef = makeFakeDocument({ withWebMcp: true });
@@ -698,7 +704,7 @@ test("forbidden-operation matrix stays blocked before any local action", async (
   assert.equal(handlers.session.safeStepCount, 0);
 });
 
-test("the story pauses at the exact preview until a separate button click", async () => {
+test("the story stops at the safe result, then requires separate brief and confirmation clicks", async () => {
   const documentRef = makeFakeDocument({ withWebMcp: true });
   const app = await boot(documentRef);
   assert.equal(documentRef.nodes.get("#run-story").disabled, false);
@@ -706,6 +712,7 @@ test("the story pauses at the exact preview until a separate button click", asyn
   assert.equal(app.registration.registered, true);
   assert.deepEqual(documentRef.registeredTools.map((tool) => tool.name), TOOL_NAMES);
   const preview = documentRef.nodes.get("#handoff-preview");
+  const prepareBriefButton = documentRef.nodes.get("#prepare-brief");
   const confirmButton = documentRef.nodes.get("#confirm-handoff");
   const storyStatus = documentRef.nodes.get("#story-status");
   const eventLog = documentRef.nodes.get("#event-log");
@@ -714,13 +721,27 @@ test("the story pauses at the exact preview until a separate button click", asyn
   assert.equal(storyStatus.dataset.state, "running");
   await storyRun;
   assert.equal(documentRef.stepNodes.get("policy").dataset.state, "done");
+  assert.equal(documentRef.nodes.get(".tool-route").dataset.progress, "3");
+  assert.equal(storyStatus.dataset.state, "safe-result");
+  const firstRunSessionId = app.handlers.session.sessionId;
+  assert.equal(preview.hidden, true);
+  assert.equal(prepareBriefButton.disabled, false);
+  assert.equal(confirmButton.disabled, true);
+  assert.equal(app.handlers.session.handoff, null);
+  assert.equal(app.handlers.session.brief, null);
+  assert.deepEqual(documentRef.executedToolNames, [
+    "understand_problem",
+    "collect_evidence",
+    "propose_safe_step",
+    "propose_safe_step",
+  ]);
+
+  await app.prepareBrief();
   assert.equal(documentRef.nodes.get(".tool-route").dataset.progress, "5");
   assert.match(documentRef.nodes.get("#tool-progress-status").textContent, /5\/5/);
   assert.equal(storyStatus.dataset.state, "paused");
-  const firstRunSessionId = app.handlers.session.sessionId;
   assert.equal(preview.hidden, false);
   assert.equal(confirmButton.disabled, false);
-  assert.equal(app.handlers.session.handoff, null);
   assert.equal(
     documentRef.nodes.get("#handoff-destination").textContent,
     "A trusted helper\nChannel: trusted-helper-draft\nLocal draft · not notified",
@@ -728,7 +749,7 @@ test("the story pauses at the exact preview until a separate button click", asyn
   for (const heading of ["facts", "what may be happening", "what is still unknown", "safe attempts"]) {
     assert.match(documentRef.nodes.get("#handoff-payload").textContent, new RegExp(heading));
   }
-  assert.match(storyStatus.textContent, /paused safely/);
+  assert.match(storyStatus.textContent, /local draft is ready/i);
   assert.equal(documentRef.nodes.get("#mobile-story-status").textContent, storyStatus.textContent);
   assert.equal(typeof documentRef.nodes.get("#run-story-mobile").listeners.get("click"), "function");
   assert.equal(eventLog.textContent.includes("Confirmed draft"), false);
@@ -753,10 +774,65 @@ test("the story pauses at the exact preview until a separate button click", asyn
   await secondRun;
 });
 
+test("visible synthetic link is the same evidence target evaluated by policy", async () => {
+  const documentRef = makeFakeDocument({ withWebMcp: true, lang: "ja" });
+  const app = await boot(documentRef);
+  await app.runStory();
+
+  const expectedTarget = "hxxps://suspicious.invalid/verify";
+  assert.equal(app.handlers.session.evidence[0].links[0].href, expectedTarget);
+  assert.ok(app.handlers.session.evidence[0].visibleText.includes(expectedTarget));
+  for (const path of ["index.html", "ja/index.html"]) {
+    assert.ok((await readFile(new URL(`../${path}`, import.meta.url), "utf8")).includes(expectedTarget));
+  }
+});
+
+test("a new story cannot reset the session while a trusted brief is being prepared", async () => {
+  const documentRef = makeFakeDocument({ withWebMcp: true });
+  const app = await boot(documentRef);
+  await app.runStory();
+
+  const originalRun = app.registration.run.bind(app.registration);
+  let releaseBrief;
+  let signalBriefStarted;
+  const briefGate = new Promise((resolve) => { releaseBrief = resolve; });
+  const briefStarted = new Promise((resolve) => { signalBriefStarted = resolve; });
+  app.registration.run = async (name, input, context) => {
+    if (name === "prepare_trusted_brief") {
+      signalBriefStarted();
+      await briefGate;
+    }
+    return originalRun(name, input, context);
+  };
+
+  const preparing = app.prepareBrief();
+  await briefStarted;
+  const preparingSessionId = app.handlers.session.sessionId;
+  await app.runStory();
+  assert.equal(app.handlers.session.sessionId, preparingSessionId);
+  releaseBrief();
+  await preparing;
+  assert.equal(documentRef.nodes.get("#story-status").dataset.state, "paused");
+});
+
+test("finishing at the safe result prevents a later brief action", async () => {
+  const documentRef = makeFakeDocument({ withWebMcp: true });
+  const app = await boot(documentRef);
+  await app.runStory();
+  const toolCount = documentRef.executedToolNames.length;
+
+  documentRef.nodes.get("#finish-here").listeners.get("click")();
+  assert.equal(documentRef.nodes.get("#prepare-brief").disabled, true);
+  await app.prepareBrief();
+  assert.equal(documentRef.executedToolNames.length, toolCount);
+  assert.equal(app.handlers.session.brief, null);
+});
+
 test("a late handoff result cannot overwrite a newer story run", async () => {
   const documentRef = makeFakeDocument({ withWebMcp: true });
   const app = await boot(documentRef);
   await app.runStory();
+  await app.prepareBrief();
 
   const originalRun = app.registration.run.bind(app.registration);
   let releaseHandoff;
@@ -782,8 +858,9 @@ test("a late handoff result cannot overwrite a newer story run", async () => {
   assert.equal(app.handlers.session.sessionId, newerSessionId);
   assert.equal(storyStatus.dataset.state, "running");
   assert.doesNotMatch(storyStatus.textContent, /Story complete|Story stopped/);
+  assert.equal(documentRef.nodes.get("#event-log").textContent.includes("Confirmed draft"), false);
   await newerStory;
-  assert.equal(storyStatus.dataset.state, "paused");
+  assert.equal(storyStatus.dataset.state, "safe-result");
 });
 
 test("Japanese evaluation view localizes the UI while preserving the same WebMCP tools and human gate", async () => {
@@ -792,12 +869,28 @@ test("Japanese evaluation view localizes the UI while preserving the same WebMCP
   await app.runStory();
 
   assert.deepEqual(documentRef.registeredTools.map((tool) => tool.name), TOOL_NAMES);
-  assert.match(documentRef.nodes.get("#webmcp-status").textContent, /WebMCP接続済み/);
+  assert.match(documentRef.nodes.get("#webmcp-status").textContent, /安全に確認する準備/);
+  assert.match(documentRef.nodes.get("#story-status").textContent, /リンクを止めました/);
+  assert.equal(documentRef.nodes.get("#handoff-preview").hidden, true);
+  assert.equal(documentRef.nodes.get("#prepare-brief").disabled, false);
+
+  await app.prepareBrief();
   assert.match(documentRef.nodes.get("#handoff-destination").textContent, /信頼できる人/);
+  assert.doesNotMatch(documentRef.nodes.get("#handoff-destination").textContent, /trusted-helper-draft/);
   assert.match(documentRef.nodes.get("#handoff-payload").textContent, /わかったこと/);
-  assert.match(documentRef.nodes.get("#story-status").textContent, /安全に一時停止/);
+  assert.doesNotMatch(documentRef.nodes.get("#handoff-payload").textContent, /The page|HelpRelay did not|No external/);
+  assert.doesNotMatch(documentRef.nodes.get("#handoff-payload").textContent, /URGENT|ignore previous|One view-only/);
+  assert.match(documentRef.nodes.get("#handoff-payload").textContent, /ページは自動で開いていません/);
+  assert.doesNotMatch(documentRef.nodes.get("#event-log").textContent, /Problem understood|Visible evidence|Safe step available|Trusted brief/);
+  assert.match(documentRef.nodes.get("#event-log").textContent, /外部への操作はしていません/);
+  assert.match(documentRef.nodes.get("#story-status").textContent, /相談メモができました/);
   assert.equal(app.handlers.session.handoff, null);
   assert.equal(documentRef.nodes.get("#confirm-handoff").disabled, false);
+
+  documentRef.nodes.get("#confirm-handoff").listeners.get("click")();
+  await waitFor(() => Boolean(app.handlers.session.handoff));
+  assert.doesNotMatch(documentRef.nodes.get("#event-log").textContent, /日本語で表示できなかった/);
+  assert.match(documentRef.nodes.get("#event-log").textContent, /本人による下書き確認/);
 });
 
 test("static server exposes only real allowlisted files and rejects secrets and symlink escapes", async () => {

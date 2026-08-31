@@ -1,83 +1,70 @@
-# One Calm Moment — selected UI concept
+# Quiet Companion — selected UI concept
 
 ## Selection
 
-`one-calm-moment-desktop.png` and `one-calm-moment-mobile.png` are the implementation authority for this revision. The direction was selected because it turns the first viewport from a technical storyboard into one calm, consumer-facing moment. The gaze path is vertical and singular: reassurance, one action, one safety decision, progress, then the local handoff preview.
+`Quiet Companion` is the implementation authority for this revision. It behaves like a calm person sitting beside someone who is unsure what to do: it asks for one decision, keeps the task in one stable place, explains what it is doing in ordinary language, then stops for the person again.
 
 Selected references:
 
-- `docs/ui-concepts/one-calm-moment-desktop.png`
-- `docs/ui-concepts/one-calm-moment-mobile.png`
+- `docs/ui-concepts/quiet-companion-concept-a.png`
+- `docs/ui-concepts/quiet-companion-desktop-initial.png`
+- `docs/ui-concepts/quiet-companion-desktop-result.png`
+- `docs/ui-concepts/quiet-companion-mobile-initial.png`
 
 Alternative retained for provenance:
 
-- `docs/ui-concepts/calm-guided-room-alternative.png`
+- `docs/ui-concepts/calm-conversation-concept-b.png`
 
 ## Product promise
 
-**When something online feels wrong, HelpRelay starts with what is already visible, stops the unsafe guess, and offers one view-only next step.**
+**When an online message feels wrong, HelpRelay checks only what is already visible, stops an unsafe action, and helps the person decide whether to stop or prepare a local note for someone they trust.**
 
-The opening experience must communicate:
+The person should understand without knowing AI, WebMCP, policy, or developer terminology:
 
-1. The person does not need to understand the technology before starting.
-2. A suspicious synthetic page is treated as untrusted evidence.
-3. Deterministic policy stops the unsafe path before any link or credential action.
-4. Only one view-only, reversible step remains.
-5. A Trusted Brief stays local until a separate human confirmation; nothing is sent.
+1. Nothing happens until they press one large button.
+2. The app stays on the same screen while each check is explained.
+3. A risky link is stopped before it opens.
+4. The only suggested step is view-only and reversible.
+5. Preparing a help note is a second decision.
+6. Confirming that local draft is a third decision; nothing is sent externally.
 
 ## Human-factors decisions
 
-- One dominant action and one dominant state scene; technical proof is progressive disclosure.
-- The desktop gaze path is top-to-bottom. No branch connectors, crossing lines, or equal-weight card grid.
-- The primary button changes label, depth, icon, and status immediately after activation.
-- Progress is always visible as a plain-language sentence plus five semantic dots. Exact tool names remain one disclosure away.
-- Blocked and safe states use color, icon, heading, and explanatory copy together; color never carries meaning alone.
-- Main explanatory copy inherits the 18 px desktop / 17 px mobile body size; only compact labels and technical metadata may be smaller. Primary controls are at least 56 px tall; all touch targets are at least 48 px.
-- Focus order follows visual order. Focus rings remain fully visible.
-- Motion is short and stateful: press response, active-step pulse, and settled result. Nothing loops decoratively.
-- `prefers-reduced-motion: reduce` renders the same final states without transforms or animation.
+- One question or decision per state. No dashboard and no simultaneous branches.
+- The gaze path is vertical: reassurance, current problem, one action, visible progress, result, optional help note.
+- The working surface keeps a stable position and scrolls into view after an intentional press, so progress never happens out of sight.
+- Normal progress lasts long enough to read: roughly 1.25–1.45 seconds per plain-language stage, about 5.3 seconds before the safe result.
+- Technical evidence is behind `どうやって守っているの？` and `くわしい確認記録を見る`; default copy does not require the term WebMCP.
+- Coral means “stopped” without an alarm wall. Jade means “view-only”. Icons and sentences duplicate color meaning.
+- Body copy is 17 px on mobile and 18 px on desktop. Main controls are at least 61 px high on mobile. Result and brief copy is never reduced to technical-caption sizing.
+- Motion is limited to press response, progress ring/dots, and state changes. `prefers-reduced-motion: reduce` removes animation and smooth scrolling while preserving the same information.
 
 ## Visual system
 
-- Canvas: warm paper `#fbf8f2`, with white `#fffdfa` for the main working surface.
-- Text: deep ink `#10213f`; muted ink `#5f6877`.
-- Primary action: indigo `#344db3`; pressed `#263b94`.
-- Safe: jade `#287a5c`, surface `#edf8f2`.
-- Blocked: warm coral `#d8624a`, surface `#fff1ec`; never use an alarming red wall.
-- Neutral proof: sand `#eee5d7`; hairline `#ded7cb`.
-- Typeface: local readable system stack only; no remote font dependency.
-- Radius: 16–28 px for contained tasks; pills only for compact statuses.
-- Depth: soft contact shadows and subtle inset button response. No glassmorphism, neon, or generic SaaS card grid.
+- Canvas: true white `#ffffff`; working surfaces use subtle cool white.
+- Text: deep navy for calm contrast; muted slate only for secondary reassurance.
+- Primary action: restrained cobalt gradient with a single soft contact shadow.
+- Stopped action: warm coral; safe result: jade.
+- Typeface: local system Japanese sans-serif stack; no remote font or third-party visual asset.
+- Radius: 14–24 px only where it clarifies one contained task. No card grid.
+- Depth: one dominant working surface; no glass, neon, decorative texture, or admin-panel chrome.
 
-## Desktop composition — 1920 × 1080
+## Responsive composition
 
-- A centered app canvas, maximum 1,420 px wide, with a compact brand/status header.
-- The intro is centered and limited to one headline, one sentence, one primary button, and one live status.
-- The main scene is a single enclosing surface. The synthetic page stays visually subordinate on the left; the policy response is the foreground focus on the right.
-- Coral `blocked` and jade `view-only` results are paired as one decision surface, not rendered as separate navigation choices.
-- A compact summary directly under the scene shows current progress. Expanding it reveals the five exact WebMCP tool names and their live states.
-- The Trusted Brief is a calm lower sheet. It shows local-only/no-send truth before the separate confirmation control.
+### Desktop — 1920 × 1080
 
-## Mobile composition — 390 × 844
+- Centered 880 px working column inside a quiet header and white canvas.
+- Headline, three-stage journey, current task, one action, and plain-language safety status fit in one gaze path.
+- Unsafe and safe results share one decision surface. The primary next choice is centered below them.
+- Five exact WebMCP tools remain inspectable in a collapsed disclosure.
 
-- The same visual order becomes a single column; it is not a scaled desktop grid.
-- The primary action remains in the first viewport with its live status immediately below.
-- The suspicious page establishes the current-state context; policy feedback follows as the foreground decision in the same vertical scene.
-- Progress uses a sentence and five dots. Tool names remain available through the same disclosure.
-- The Trusted Brief follows the current scene and never obscures the primary action.
-- No horizontal overflow at 320, 375, or 390 px.
+### Mobile — 390 × 844
 
-## Required DOM and behavior seams
+- The same state replaces the same working surface; there is no scaled desktop grid.
+- A press scrolls the active surface into view, keeping the progress message, safety result, and later handoff preview visible.
+- Controls remain finger-sized and there is no horizontal overflow at 320 or 390 px.
+- The help note is reviewed as readable Japanese sections before the separate confirmation control.
 
-The redesign preserves:
+## Preserved seams and safety boundary
 
-- `#run-story`, `#run-story-mobile`, `#webmcp-status`, `#story-status`, `#mobile-story-status`, `#event-log`
-- `#relay-stage`, `.tool-route`, `#tool-progress-status`
-- `#handoff-preview`, `#handoff-destination`, `#handoff-payload`, `#handoff-raw-payload`, `#confirm-handoff`, `#helper-preview-placeholder`
-- `#problem-form`, `#problem-input`, `#human-status`
-- exactly one `[data-step]` each for `understand`, `evidence`, `policy`, `blocked`, `safe`, `brief`, and `handoff`, each with `.step-state`
-- the five tool contracts, independent policy, evidence binding, replay protection, separate human confirmation receipt, and no-send behavior.
-
-## Above-the-fold copy contract
-
-Japanese starts with `大丈夫。いま見えている画面から確かめます。` and `いっしょに確かめる`. English uses the same plain-language meaning. The first viewport may state the blocked action, the one view-only step, visible progress, local Trusted Brief, separate confirmation, and no-send boundary. Implementation and event detail stays in disclosures.
+The redesign preserves all existing DOM seams used by the tests, the five exact tool contracts, deterministic policy, evidence binding, replay protection, separate human confirmation receipt, and no-send behavior. The five tools remain `understand_problem`, `collect_evidence`, `propose_safe_step`, `prepare_trusted_brief`, and `request_handoff`.
