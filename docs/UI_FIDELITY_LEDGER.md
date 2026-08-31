@@ -34,13 +34,15 @@ Removed or moved behind disclosures:
 
 Replaced with:
 
-- `困りましたね。ここから一緒に見ます。`
-- `怖かったですよね。まずは、ここだけ見れば大丈夫です。`
-- `いまは、下の青いボタンだけで大丈夫です`
-- `この画面を一緒に確認する`
-- `まず、何に困っているのか受け止めています`
-- `危ないかもしれないリンクを止めました。何も開いていません。`
-- a separate `相談メモを作る` decision and a later `この下書き内容を確認する` decision
+- `このお知らせ、先に確認します。`
+- `まず、この画面だけ見れば十分です。`
+- `次は、下の青いボタンを押してください`
+- `内容を確認する`
+- `困っている内容を確認しています`
+- `危ない操作は止めました。リンクは開いていません。`
+- a separate `相談メモを作る` decision and a later `この内容で確認済みにする` decision
+
+The Japanese copy avoids guessing the person's feelings or repeatedly announcing reassurance. It uses concrete next actions and explicit no-action statements instead.
 
 ## Intentional deviations
 

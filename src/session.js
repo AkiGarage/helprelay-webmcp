@@ -3,7 +3,7 @@ import {
   digestPayload,
   MAX_BRIEF_ITEMS,
   stableDigest,
-} from "./contracts.js?v=20260831h";
+} from "./contracts.js?v=20260831i";
 
 const MAX_STORED_TEXT = 5000;
 

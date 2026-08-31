@@ -219,18 +219,18 @@ test("tool disclosure distinguishes real WebMCP registration from local practice
   assert.match(fallbackDocument.nodes.get(".proof-runtime-copy").textContent, /この端末/);
 });
 
-test("Japanese evaluation view keeps empathy, the next action, and core safety promises visible", async () => {
+test("Japanese evaluation view keeps the next action and core safety promises visible", async () => {
   const html = await readFile(new URL("../ja/index.html", import.meta.url), "utf8");
 
   assert.match(html, /class="companion-cue"/);
-  assert.match(html, /いまは、下の青いボタンだけで大丈夫です/);
+  assert.match(html, /次は、下の青いボタンを押してください/);
   assert.match(html, /class="safety-promise-grid"/);
   assert.match(html, /リンクを開きません/);
-  assert.match(html, /入力や購入をしません/);
-  assert.match(html, /あなたが決めるまで送りません/);
+  assert.match(html, /入力・購入をしません/);
+  assert.match(html, /確認するまで送りません/);
   assert.match(html, /id="progress-title"/);
   assert.match(html, /id="progress-detail"/);
-  assert.match(html, /安全チェックの進み方を見る/);
+  assert.match(html, /確認のしくみを見る/);
 });
 
 test("the visible help link opens and focuses the five-tool explanation", async () => {
@@ -919,20 +919,20 @@ test("Japanese evaluation view localizes the UI while preserving the same WebMCP
   await app.runStory();
 
   assert.deepEqual(documentRef.registeredTools.map((tool) => tool.name), TOOL_NAMES);
-  assert.match(documentRef.nodes.get("#webmcp-status").textContent, /安全に確認する準備/);
-  assert.match(documentRef.nodes.get("#story-status").textContent, /リンクを止めました/);
+  assert.match(documentRef.nodes.get("#webmcp-status").textContent, /確認の準備/);
+  assert.match(documentRef.nodes.get("#story-status").textContent, /危ない操作は止めました/);
   assert.equal(documentRef.nodes.get("#handoff-preview").hidden, true);
   assert.equal(documentRef.nodes.get("#prepare-brief").disabled, false);
 
   await app.prepareBrief();
   assert.match(documentRef.nodes.get("#handoff-destination").textContent, /信頼できる人/);
   assert.doesNotMatch(documentRef.nodes.get("#handoff-destination").textContent, /trusted-helper-draft/);
-  assert.match(documentRef.nodes.get("#handoff-payload").textContent, /わかったこと/);
+  assert.match(documentRef.nodes.get("#handoff-payload").textContent, /確認できたこと/);
   assert.doesNotMatch(documentRef.nodes.get("#handoff-payload").textContent, /The page|HelpRelay did not|No external/);
   assert.doesNotMatch(documentRef.nodes.get("#handoff-payload").textContent, /URGENT|ignore previous|One view-only/);
   assert.match(documentRef.nodes.get("#handoff-payload").textContent, /ページは自動で開いていません/);
   assert.doesNotMatch(documentRef.nodes.get("#event-log").textContent, /Problem understood|Visible evidence|Safe step available|Trusted brief/);
-  assert.match(documentRef.nodes.get("#event-log").textContent, /外部への操作はしていません/);
+  assert.match(documentRef.nodes.get("#event-log").textContent, /外部への操作はありません/);
   assert.match(documentRef.nodes.get("#story-status").textContent, /相談メモができました/);
   assert.equal(app.handlers.session.handoff, null);
   assert.equal(documentRef.nodes.get("#confirm-handoff").disabled, false);
@@ -940,7 +940,7 @@ test("Japanese evaluation view localizes the UI while preserving the same WebMCP
   documentRef.nodes.get("#confirm-handoff").listeners.get("click")();
   await waitFor(() => Boolean(app.handlers.session.handoff));
   assert.doesNotMatch(documentRef.nodes.get("#event-log").textContent, /日本語で表示できなかった/);
-  assert.match(documentRef.nodes.get("#event-log").textContent, /本人による下書き確認/);
+  assert.match(documentRef.nodes.get("#event-log").textContent, /本人が下書き内容を確認/);
 });
 
 test("static server exposes only real allowlisted files and rejects secrets and symlink escapes", async () => {
