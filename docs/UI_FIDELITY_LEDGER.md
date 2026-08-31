@@ -10,17 +10,18 @@ Actual screenshots:
 - `docs/assets/helprelay-ja-mobile-initial.png`
 - `docs/assets/helprelay-ja-mobile-running.png`
 - `docs/assets/helprelay-ja-mobile.png`
-- `docs/assets/helprelay-ja-mobile-handoff-preview.png`
+- `docs/assets/helprelay-ja-desktop-handoff.png`
+- `docs/assets/helprelay-ja-mobile-handoff.png`
 
 ## Concept-to-code comparison
 
 | Comparison point | Concept | Implemented result | Verdict |
 | --- | --- | --- | --- |
-| Gaze path | One centered reassurance-to-action path | Headline → three stages → current problem → one button; details remain collapsed | Match |
+| Gaze path | One centered reassurance-to-action path | Empathic welcome → three stages → reassuring companion cue → current problem → arrow cue → one button; the three safety promises stay visible | Match |
 | State recognition | Stable surface changes in place | Ready, checking, safe result, brief preparation, and confirmation preview replace the same working surface and scroll into view after a press | Match |
 | Safety contrast | Coral stop beside jade view-only result | Both outcomes use icon, heading, explanatory sentence, and color; the third journey step activates only when a help note is requested | Match |
 | Consumer language | No technology knowledge required | Default Japanese removes visible WebMCP jargon and localizes the help note and event log; exact tool names remain available inside the safety disclosure | Match |
-| Tactile finish | White canvas, deep navy, restrained cobalt, soft depth | Code-native mark, one contact shadow, 61–68 px main controls, clear press/focus states, warm coral and jade surfaces | Match |
+| Tactile finish | Warm companion surface, deep navy, restrained cobalt, soft depth | Warm ivory/apricot/jade light, code-native mark, 61–68 px main controls, clear press/focus states, and paper-like depth | Match |
 
 ## Copy changes from the rejected UI
 
@@ -33,10 +34,11 @@ Removed or moved behind disclosures:
 
 Replaced with:
 
-- `大丈夫。いっしょに確認しましょう。`
-- `画面を変えたり、誰かに送ったりしません。`
-- `この画面を確認する`
-- `まず、何に困っているのか受け止めています…`
+- `困りましたね。ここから一緒に見ます。`
+- `怖かったですよね。まずは、ここだけ見れば大丈夫です。`
+- `いまは、下の青いボタンだけで大丈夫です`
+- `この画面を一緒に確認する`
+- `まず、何に困っているのか受け止めています`
 - `危ないかもしれないリンクを止めました。何も開いていません。`
 - a separate `相談メモを作る` decision and a later `この下書き内容を確認する` decision
 
@@ -49,13 +51,13 @@ Replaced with:
 
 ## Visual QA evidence
 
-- Browser method: Codex in-app Browser, real page-loaded WebMCP registrations, viewport override at 1920×1080, 390×844, and 320×844.
+- Browser method: Codex in-app Browser, real page-loaded WebMCP registrations, viewport override at 1920×1080 and 390×844.
 - 1920×1080: one primary task surface; checking and result remain fully visible after activation.
 - 390×844: active work automatically moves into view; safe result and handoff preview remain in the same column; no horizontal overflow.
-- 320×844: `scrollWidth === innerWidth`; visible mobile action is 61 px high.
-- Reduced motion: browser-emulated `prefers-reduced-motion: reduce` matched; progress dots and status pulse reported `animation-name: none`, with `scroll-behavior: auto`.
+- 390×844: `scrollWidth === innerWidth`; the mobile primary action is 61 px high.
+- Reduced motion: browser-emulated `prefers-reduced-motion: reduce` matched; the progress orb reported `animation-duration: 0s`, button transitions were effectively disabled, and `scroll-behavior: auto`.
 - WebMCP: the browser reported all five page-defined tools from the local page. The exercised UI path called the real registered executor, stopped at progress 3 before brief creation, paused before `request_handoff`, and recorded `外部には送っていません` only after the separate human confirmation.
-- Regression checks: `npm test` passed 27/27 executable tests, including visible-evidence matching and stale async-result isolation; `npm run check` passed all required-file and module checks.
+- Regression checks: `npm test` passed 29/29 executable tests, including visible-evidence matching, stale async-result isolation, always-visible empathy/safety copy, and the help-link tool disclosure; `npm run check` passed all required-file and module checks.
 
 ## Agency signoff
 

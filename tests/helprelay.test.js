@@ -49,6 +49,14 @@ function makeFakeDocument({ withWebMcp = false, lang = "en" } = {}) {
   const prepareBriefButton = makeNode({ disabled: true });
   const confirmButton = makeNode();
   const eventLog = makeNode({ scrollHeight: 0, scrollTop: 0 });
+  const howItWorksSummary = makeNode({
+    focused: false,
+    focus() { this.focused = true; },
+  });
+  const howItWorks = makeNode({
+    open: false,
+    querySelector(selector) { return selector === "summary" ? howItWorksSummary : null; },
+  });
   const stepNodes = new Map();
   for (const name of ["understand", "evidence", "policy", "blocked", "safe", "brief", "handoff"]) {
     const state = makeNode();
@@ -72,6 +80,8 @@ function makeFakeDocument({ withWebMcp = false, lang = "en" } = {}) {
     [".tool-route", makeNode()],
     ["#webmcp-status", makeNode()],
     ["#human-status", makeNode()],
+    [".help-link", makeNode()],
+    ["#how-it-works", howItWorks],
   ]) {
     nodes.set(selector, node);
   }
@@ -195,6 +205,34 @@ test("story buttons stay disabled in static HTML until boot finishes WebMCP regi
   await boot(documentRef);
   assert.equal(documentRef.nodes.get("#run-story").disabled, false);
   assert.equal(documentRef.nodes.get("#run-story-mobile").disabled, false);
+});
+
+test("Japanese evaluation view keeps empathy, the next action, and core safety promises visible", async () => {
+  const html = await readFile(new URL("../ja/index.html", import.meta.url), "utf8");
+
+  assert.match(html, /class="companion-cue"/);
+  assert.match(html, /いまは、下の青いボタンだけで大丈夫です/);
+  assert.match(html, /class="safety-promise-grid"/);
+  assert.match(html, /リンクを開きません/);
+  assert.match(html, /入力や購入をしません/);
+  assert.match(html, /あなたが決めるまで送りません/);
+  assert.match(html, /id="progress-title"/);
+  assert.match(html, /id="progress-detail"/);
+  assert.match(html, /安全チェックの進み方を見る/);
+});
+
+test("the visible help link opens and focuses the five-tool explanation", async () => {
+  const documentRef = makeFakeDocument({ withWebMcp: true, lang: "ja" });
+  await boot(documentRef);
+  const helpLink = documentRef.nodes.get(".help-link");
+  const howItWorks = documentRef.nodes.get("#how-it-works");
+  let prevented = false;
+
+  helpLink.listeners.get("click")({ preventDefault() { prevented = true; } });
+
+  assert.equal(prevented, true);
+  assert.equal(howItWorks.open, true);
+  assert.equal(howItWorks.querySelector("summary").focused, true);
 });
 
 test("understand_problem safely bootstraps and returns the complete envelope for later typed calls", async () => {

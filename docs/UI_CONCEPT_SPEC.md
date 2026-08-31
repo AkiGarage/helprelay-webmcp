@@ -2,7 +2,7 @@
 
 ## Selection
 
-`Quiet Companion` is the implementation authority for this revision. It behaves like a calm person sitting beside someone who is unsure what to do: it asks for one decision, keeps the task in one stable place, explains what it is doing in ordinary language, then stops for the person again.
+`Quiet Companion` is the implementation authority for this revision. The finished direction is a warm, present companion rather than a waiting-room interface: it acknowledges fear, points to one next action, keeps the task in one stable place, explains what it is doing in ordinary language, then stops for the person again.
 
 Selected references:
 
@@ -33,21 +33,21 @@ The person should understand without knowing AI, WebMCP, policy, or developer te
 - One question or decision per state. No dashboard and no simultaneous branches.
 - The gaze path is vertical: reassurance, current problem, one action, visible progress, result, optional help note.
 - The working surface keeps a stable position and scrolls into view after an intentional press, so progress never happens out of sight.
-- Normal progress lasts long enough to read: roughly 1.25–1.45 seconds per plain-language stage, about 5.3 seconds before the safe result.
-- Technical evidence is behind `どうやって守っているの？` and `くわしい確認記録を見る`; default copy does not require the term WebMCP.
+- Normal progress lasts long enough to read: roughly 1.65–1.9 seconds per plain-language stage. The current action remains large and centered while it runs.
+- The three promises—no link opening, no input or purchase, and no sending without the person—are always visible. Only exact tool names and raw technical evidence remain in disclosures.
 - Coral means “stopped” without an alarm wall. Jade means “view-only”. Icons and sentences duplicate color meaning.
 - Body copy is 17 px on mobile and 18 px on desktop. Main controls are at least 61 px high on mobile. Result and brief copy is never reduced to technical-caption sizing.
 - Motion is limited to press response, progress ring/dots, and state changes. `prefers-reduced-motion: reduce` removes animation and smooth scrolling while preserving the same information.
 
 ## Visual system
 
-- Canvas: true white `#ffffff`; working surfaces use subtle cool white.
+- Canvas: warm ivory with apricot and pale jade light; working surfaces stay bright enough for high-contrast reading.
 - Text: deep navy for calm contrast; muted slate only for secondary reassurance.
 - Primary action: restrained cobalt gradient with a single soft contact shadow.
 - Stopped action: warm coral; safe result: jade.
 - Typeface: local system Japanese sans-serif stack; no remote font or third-party visual asset.
-- Radius: 14–24 px only where it clarifies one contained task. No card grid.
-- Depth: one dominant working surface; no glass, neon, decorative texture, or admin-panel chrome.
+- Radius: 14–28 px where it softens one contained task. The three safety promises form one supporting strip, not a dashboard grid.
+- Depth: one dominant working surface, soft paper-like shadows, and two quiet color blooms; no glass, neon, or admin-panel chrome.
 
 ## Responsive composition
 

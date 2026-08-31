@@ -1,18 +1,18 @@
 import {
   ALLOWED_HANDOFF_CHANNEL,
   createTextResult,
-} from "./contracts.js?v=20260831e";
-import { createSession, sessionEnvelope } from "./session.js?v=20260831e";
-import { confirmHandoff, createDomainHandlers } from "./tools.js?v=20260831e";
-import { registerWebMcpTools } from "./webmcp.js?v=20260831e";
+} from "./contracts.js?v=20260831f";
+import { createSession, sessionEnvelope } from "./session.js?v=20260831f";
+import { confirmHandoff, createDomainHandlers } from "./tools.js?v=20260831f";
+import { registerWebMcpTools } from "./webmcp.js?v=20260831f";
 
 const UI_COPY = Object.freeze({
   en: Object.freeze({
     connected: () => "Ready to check safely",
     unavailable: "Safe local practice is ready",
-    start: "Check this screen",
+    start: "Check this screen together",
     checking: "Stay here — checking only what is visible…",
-    prepare: "Prepare a help note",
+    prepare: "Prepare a help note together",
     preparing: "Preparing a short help note…",
     confirm: "Confirm this local draft",
     waiting: "Waiting",
@@ -41,6 +41,11 @@ const UI_COPY = Object.freeze({
       handoff: "5/5 · Waiting for you",
       complete: "5/5 · Local draft confirmed",
       stopped: "Stopped safely",
+    }),
+    stages: Object.freeze({
+      understand: Object.freeze({ counter: "1/3 · Understanding your concern", title: "First, we are listening to what feels wrong", detail: "We are turning the worrying parts into a short, clear description." }),
+      evidence: Object.freeze({ counter: "2/3 · Checking what is visible", title: "Now we are looking only at this screen", detail: "The page wording is treated as untrusted. No link is opened." }),
+      policy: Object.freeze({ counter: "3/3 · Applying fixed safety rules", title: "The safety rules are checking the risky request", detail: "Opening links, typing passwords, and making purchases are not allowed." }),
     }),
     missingBrief: "Story stopped safely · no brief was available.",
     paused: "The local draft is ready. Review it before confirming.",
@@ -85,9 +90,9 @@ const UI_COPY = Object.freeze({
   ja: Object.freeze({
     connected: () => "安全に確認する準備ができました",
     unavailable: "この端末で安全に練習できます",
-    start: "この画面を確認する",
+    start: "この画面を一緒に確認する",
     checking: "このままお待ちください。見えている画面だけ確認しています…",
-    prepare: "相談メモを作る",
+    prepare: "相談メモを一緒に作る",
     preparing: "相談メモを作っています…",
     confirm: "この下書き内容を確認する",
     waiting: "待機中",
@@ -116,6 +121,11 @@ const UI_COPY = Object.freeze({
       handoff: "5/5・あなたの確認待ち",
       complete: "5/5・下書き確認済み",
       stopped: "安全に停止しました",
+    }),
+    stages: Object.freeze({
+      understand: Object.freeze({ counter: "1/3・困りごとを整理", title: "まず、困りごとを受け止めています", detail: "怖いと感じたところを、短い言葉に整理しています。" }),
+      evidence: Object.freeze({ counter: "2/3・見えているものを確認", title: "つぎに、この画面だけを見ています", detail: "お知らせの言葉は信用せず、リンクも開いていません。" }),
+      policy: Object.freeze({ counter: "3/3・安全ルールで確認", title: "危ない操作を、決まったルールで止めています", detail: "リンク、パスワード、購入には進めないようにしています。" }),
     }),
     missingBrief: "相談メモを作れなかったため、安全に停止しました。",
     paused: "相談メモができました。相手と内容を確認してから、下のボタンを押してください。",
@@ -302,6 +312,13 @@ export async function boot(documentRef = globalThis.document) {
   const finishHereButton = documentRef.querySelector("#finish-here");
   const helperPlaceholder = documentRef.querySelector("#helper-preview-placeholder");
   const relayStage = documentRef.querySelector("#relay-stage");
+  const policyTitle = documentRef.querySelector("#policy-title");
+  const helperTitle = documentRef.querySelector("#helper-title");
+  const progressCounter = documentRef.querySelector("#progress-counter");
+  const progressTitle = documentRef.querySelector("#progress-title");
+  const progressDetail = documentRef.querySelector("#progress-detail");
+  const helpLink = documentRef.querySelector(".help-link");
+  const howItWorks = documentRef.querySelector("#how-it-works");
   let pendingHandoff = null;
   let storyRunning = false;
   let briefRunning = false;
@@ -360,6 +377,25 @@ export async function boot(documentRef = globalThis.document) {
     }
   }
 
+  function showProgressStage(name) {
+    const stage = copy.stages[name];
+    if (!stage) return;
+    if (progressCounter) progressCounter.textContent = stage.counter;
+    if (progressTitle) progressTitle.textContent = stage.title;
+    if (progressDetail) progressDetail.textContent = stage.detail;
+  }
+
+  function guideAttention(target = relayStage) {
+    if (!documentRef.defaultView || typeof target?.scrollIntoView !== "function") return;
+    const reducedMotion = documentRef.defaultView.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches ?? false;
+    target.scrollIntoView({ behavior: reducedMotion ? "auto" : "smooth", block: "start" });
+  }
+
+  function focusNextScreen(target, scrollTarget = relayStage) {
+    guideAttention(scrollTarget);
+    target?.focus?.({ preventScroll: true });
+  }
+
   function updateJourney(current, completed = []) {
     const steps = documentRef.querySelectorAll?.("[data-journey-step]") ?? [];
     for (const step of steps) {
@@ -381,6 +417,8 @@ export async function boot(documentRef = globalThis.document) {
     updateStoryState("running");
     updateJourney("check");
     updateProgress(0, copy.progress.ready, "running");
+    showProgressStage("understand");
+    focusNextScreen(progressTitle);
     if (relayStage) relayStage.dataset.phase = "ready";
     pendingHandoff = null;
     if (handoffPreview) handoffPreview.hidden = true;
@@ -414,35 +452,38 @@ export async function boot(documentRef = globalThis.document) {
     try {
       mark("understand", "active", copy.running);
       updateProgress(1, copy.progress.understand);
+      showProgressStage("understand");
       setStatus(documentRef, "#story-status", copy.listen);
       const understood = await invokeWithVisibleProgress(
         "understand_problem",
         { userStatement: copy.story.statement },
         copy.labels.understand,
-        1250,
+        1650,
       );
       mark("understand", statusForResult(understood) === "problem-understood" ? "done" : "blocked", copy.done);
 
       mark("evidence", "active", copy.running);
       updateProgress(2, copy.progress.evidence);
+      showProgressStage("evidence");
       setStatus(documentRef, "#story-status", copy.evidence);
       const evidence = await invokeWithVisibleProgress(
         "collect_evidence",
         makeStoryEvidence(copy),
         copy.labels.evidence,
-        1300,
+        1750,
       );
       mark("evidence", statusForResult(evidence) === "evidence-captured" ? "done" : "blocked", copy.untrusted);
 
       mark("policy", "active", copy.policyChecking);
       mark("blocked", "active", copy.policyChecking);
       updateProgress(3, copy.progress.policy);
+      showProgressStage("policy");
       setStatus(documentRef, "#story-status", copy.policy);
       const blocked = await invokeWithVisibleProgress(
         "propose_safe_step",
         { stepId: "open_suspicious_link", target: "hxxps://suspicious.invalid/verify" },
         copy.labels.unsafe,
-        1450,
+        1900,
       );
       mark("blocked", statusForResult(blocked) === "blocked" ? "blocked" : "done", copy.blocked);
 
@@ -452,13 +493,14 @@ export async function boot(documentRef = globalThis.document) {
         "propose_safe_step",
         { stepId: "review_visible_context", target: "current-context" },
         copy.labels.safe,
-        1300,
+        1700,
       );
       mark("safe", statusForResult(safe) === "safe-step-offered" ? "done" : "blocked", copy.viewOnly);
       mark("policy", "done", copy.policyApplied);
       updateProgress(3, copy.safe, "safe-result");
       updateJourney("safe", ["check"]);
       updateStoryState("safe-result");
+      focusNextScreen(policyTitle);
       setStatus(documentRef, "#story-status", copy.safe);
       if (prepareBriefButton) prepareBriefButton.disabled = false;
     } finally {
@@ -481,6 +523,7 @@ export async function boot(documentRef = globalThis.document) {
     if (handoffPreview) handoffPreview.hidden = true;
     updateJourney("brief", ["check", "safe"]);
     updateStoryState("brief-running");
+    focusNextScreen(helperTitle);
     mark("brief", "active", copy.running);
     updateProgress(4, copy.progress.brief);
     setStatus(documentRef, "#story-status", copy.brief);
@@ -490,7 +533,7 @@ export async function boot(documentRef = globalThis.document) {
         "prepare_trusted_brief",
         { helperLabel: copy.story.helper },
         copy.labels.brief,
-        1400,
+        1800,
       );
       if (handlers.session.sessionId !== briefSessionId) return;
       mark("brief", statusForResult(briefResult) === "brief-prepared" ? "done" : "blocked", copy.drafted);
@@ -514,6 +557,7 @@ export async function boot(documentRef = globalThis.document) {
       if (confirmButton) confirmButton.disabled = false;
       setStatus(documentRef, "#story-status", copy.paused);
       updateStoryState("paused");
+      focusNextScreen(handoffPreview, handoffPreview ?? relayStage);
     } finally {
       briefRunning = false;
       if (handlers.session.sessionId === briefSessionId) updateRunButtons(copy.again, false);
@@ -526,6 +570,15 @@ export async function boot(documentRef = globalThis.document) {
 
   mobileRunButton?.addEventListener("click", () => {
     void runStory();
+  });
+
+  helpLink?.addEventListener("click", (event) => {
+    event.preventDefault();
+    if (!howItWorks) return;
+    howItWorks.open = true;
+    const summary = howItWorks.querySelector?.("summary");
+    guideAttention(howItWorks);
+    summary?.focus?.({ preventScroll: true });
   });
 
   prepareBriefButton?.addEventListener("click", () => {

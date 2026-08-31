@@ -8,8 +8,8 @@ import {
   digestPayload,
   isPlainObject,
   stableDigest,
-} from "./contracts.js?v=20260831e";
-import { handoffFingerprint, handoffStateSnapshot } from "./session.js?v=20260831e";
+} from "./contracts.js?v=20260831f";
+import { handoffFingerprint, handoffStateSnapshot } from "./session.js?v=20260831f";
 
 const RISK_PATTERNS = Object.freeze([
   ["prompt-injection", /ignore\s+(?:all|any|the|previous|prior)|disregard\s+(?:all|any|the|previous|prior)|system\s+message|developer\s+message|reveal\s+(?:the|your)\s+instructions/i],
