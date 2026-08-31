@@ -1,10 +1,10 @@
 import {
   ALLOWED_HANDOFF_CHANNEL,
   createTextResult,
-} from "./contracts.js?v=20260831g";
-import { createSession, sessionEnvelope } from "./session.js?v=20260831g";
-import { confirmHandoff, createDomainHandlers } from "./tools.js?v=20260831g";
-import { registerWebMcpTools } from "./webmcp.js?v=20260831g";
+} from "./contracts.js?v=20260831h";
+import { createSession, sessionEnvelope } from "./session.js?v=20260831h";
+import { confirmHandoff, createDomainHandlers } from "./tools.js?v=20260831h";
+import { registerWebMcpTools } from "./webmcp.js?v=20260831h";
 
 const UI_COPY = Object.freeze({
   en: Object.freeze({

@@ -53,6 +53,7 @@ Replaced with:
 
 - Browser method: Codex in-app Browser, real page-loaded WebMCP registrations, viewport override at 1920×1080 and 390×844.
 - 1920×1080: one primary task surface; checking and result remain fully visible after activation.
+- 1280×720 live-review viewport: the single primary action remains visible at the bottom of the first screen, then yields to the centered progress state.
 - 390×844: active work automatically moves into view; safe result and handoff preview remain in the same column; no horizontal overflow.
 - 390×844: `scrollWidth === innerWidth`; the 61 px mobile primary action stays visible at the bottom of the first screen, then yields to the guided flow after activation.
 - Reduced motion: browser-emulated `prefers-reduced-motion: reduce` matched; active animations were removed, button transitions were effectively disabled, and `scroll-behavior: auto`.
