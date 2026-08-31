@@ -54,10 +54,10 @@ Replaced with:
 - Browser method: Codex in-app Browser, real page-loaded WebMCP registrations, viewport override at 1920×1080 and 390×844.
 - 1920×1080: one primary task surface; checking and result remain fully visible after activation.
 - 390×844: active work automatically moves into view; safe result and handoff preview remain in the same column; no horizontal overflow.
-- 390×844: `scrollWidth === innerWidth`; the mobile primary action is 61 px high.
-- Reduced motion: browser-emulated `prefers-reduced-motion: reduce` matched; the progress orb reported `animation-duration: 0s`, button transitions were effectively disabled, and `scroll-behavior: auto`.
+- 390×844: `scrollWidth === innerWidth`; the 61 px mobile primary action stays visible at the bottom of the first screen, then yields to the guided flow after activation.
+- Reduced motion: browser-emulated `prefers-reduced-motion: reduce` matched; active animations were removed, button transitions were effectively disabled, and `scroll-behavior: auto`.
 - WebMCP: the browser reported all five page-defined tools from the local page. The exercised UI path called the real registered executor, stopped at progress 3 before brief creation, paused before `request_handoff`, and recorded `外部には送っていません` only after the separate human confirmation.
-- Regression checks: `npm test` passed 29/29 executable tests, including visible-evidence matching, stale async-result isolation, always-visible empathy/safety copy, and the help-link tool disclosure; `npm run check` passed all required-file and module checks.
+- Regression checks: `npm test` passed 30/30 executable tests, including visible-evidence matching, stale async-result isolation, always-visible empathy/safety copy, the help-link tool disclosure, and distinct real-WebMCP/local-practice wording; `npm run check` passed all required-file and module checks.
 
 ## Agency signoff
 

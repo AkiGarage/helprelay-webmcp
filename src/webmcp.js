@@ -1,5 +1,5 @@
-import { TOOL_DEFINITIONS, TOOL_NAMES, failResult } from "./contracts.js?v=20260831f";
-import { createDomainHandlers, guardToolResult } from "./tools.js?v=20260831f";
+import { TOOL_DEFINITIONS, TOOL_NAMES, failResult } from "./contracts.js?v=20260831g";
+import { createDomainHandlers, guardToolResult } from "./tools.js?v=20260831g";
 
 /**
  * Register exactly the five public HelpRelay tools on the current WebMCP

@@ -79,6 +79,7 @@ function makeFakeDocument({ withWebMcp = false, lang = "en" } = {}) {
     ["#tool-progress-status", makeNode()],
     [".tool-route", makeNode()],
     ["#webmcp-status", makeNode()],
+    [".proof-runtime-copy", makeNode()],
     ["#human-status", makeNode()],
     [".help-link", makeNode()],
     ["#how-it-works", howItWorks],
@@ -205,6 +206,17 @@ test("story buttons stay disabled in static HTML until boot finishes WebMCP regi
   await boot(documentRef);
   assert.equal(documentRef.nodes.get("#run-story").disabled, false);
   assert.equal(documentRef.nodes.get("#run-story-mobile").disabled, false);
+});
+
+test("tool disclosure distinguishes real WebMCP registration from local practice", async () => {
+  const registeredDocument = makeFakeDocument({ withWebMcp: true, lang: "ja" });
+  await boot(registeredDocument);
+  assert.match(registeredDocument.nodes.get(".proof-runtime-copy").textContent, /WebMCP/);
+
+  const fallbackDocument = makeFakeDocument({ withWebMcp: false, lang: "ja" });
+  await boot(fallbackDocument);
+  assert.doesNotMatch(fallbackDocument.nodes.get(".proof-runtime-copy").textContent, /WebMCP/);
+  assert.match(fallbackDocument.nodes.get(".proof-runtime-copy").textContent, /この端末/);
 });
 
 test("Japanese evaluation view keeps empathy, the next action, and core safety promises visible", async () => {

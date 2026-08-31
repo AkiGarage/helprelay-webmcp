@@ -1,15 +1,17 @@
 import {
   ALLOWED_HANDOFF_CHANNEL,
   createTextResult,
-} from "./contracts.js?v=20260831f";
-import { createSession, sessionEnvelope } from "./session.js?v=20260831f";
-import { confirmHandoff, createDomainHandlers } from "./tools.js?v=20260831f";
-import { registerWebMcpTools } from "./webmcp.js?v=20260831f";
+} from "./contracts.js?v=20260831g";
+import { createSession, sessionEnvelope } from "./session.js?v=20260831g";
+import { confirmHandoff, createDomainHandlers } from "./tools.js?v=20260831g";
+import { registerWebMcpTools } from "./webmcp.js?v=20260831g";
 
 const UI_COPY = Object.freeze({
   en: Object.freeze({
     connected: () => "Ready to check safely",
     unavailable: "Safe local practice is ready",
+    proofRegistered: "Five WebMCP tools really run when you press the button",
+    proofFallback: "Local practice uses the same five safety checks",
     start: "Check this screen together",
     checking: "Stay here — checking only what is visible…",
     prepare: "Prepare a help note together",
@@ -90,6 +92,8 @@ const UI_COPY = Object.freeze({
   ja: Object.freeze({
     connected: () => "安全に確認する準備ができました",
     unavailable: "この端末で安全に練習できます",
+    proofRegistered: "押すと、5つのWebMCP道具が実際に動きます",
+    proofFallback: "この端末では、同じ5つの安全確認を練習します",
     start: "この画面を一緒に確認する",
     checking: "このままお待ちください。見えている画面だけ確認しています…",
     prepare: "相談メモを一緒に作る",
@@ -287,11 +291,15 @@ export async function boot(documentRef = globalThis.document) {
   const handlers = createDomainHandlers(createSession());
   const registration = await registerWebMcpTools({ documentRef, handlers });
   const webmcpStatus = documentRef.querySelector("#webmcp-status");
+  const proofRuntimeCopy = documentRef.querySelector(".proof-runtime-copy");
   if (webmcpStatus) {
     webmcpStatus.textContent = registration.registered
       ? copy.connected(registration.names.length)
       : copy.unavailable;
     webmcpStatus.dataset.connected = String(registration.registered);
+  }
+  if (proofRuntimeCopy) {
+    proofRuntimeCopy.textContent = registration.registered ? copy.proofRegistered : copy.proofFallback;
   }
 
   const runButton = documentRef.querySelector("#run-story");

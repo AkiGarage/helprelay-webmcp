@@ -269,7 +269,11 @@ html[lang="en"] .journey-progress li[aria-current="step"]::before { content: "YO
 #progress-title:focus,
 #policy-title:focus,
 #helper-title:focus,
-#handoff-preview:focus { outline: none; }
+#handoff-preview:focus {
+  outline: 3px solid rgb(20 84 216 / 45%);
+  outline-offset: 6px;
+  border-radius: 9px;
+}
 #handoff-preview, #how-it-works { scroll-margin-top: 22px; }
 
 .relay-primary {
@@ -811,6 +815,20 @@ textarea:focus-visible {
   .next-action-cue { align-items: flex-start; margin-top: 16px; font-size: 0.8rem; line-height: 1.4; text-align: left; }
   .next-action-cue > span { width: 27px; height: 27px; flex: 0 0 auto; }
   .mobile-start { display: block; margin-top: 9px; }
+  .relay-stage[data-story-state="ready"] .mobile-start {
+    position: fixed;
+    z-index: 30;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    margin: 0;
+    padding: 18px 14px max(14px, env(safe-area-inset-bottom));
+    background: linear-gradient(180deg, rgb(255 250 243 / 0%), rgb(255 250 243 / 94%) 28%, rgb(255 250 243 / 98%));
+  }
+  .relay-stage[data-story-state="ready"] .mobile-start .button {
+    width: min(100%, 420px);
+    margin-inline: auto;
+  }
   .button-primary { min-height: 61px; padding-inline: 16px; font-size: 1rem; }
   .button-primary > svg { width: 25px; height: 25px; }
   .trust-promise { margin-top: 11px; font-size: 0.72rem; }
