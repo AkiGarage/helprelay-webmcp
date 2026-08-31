@@ -1,10 +1,10 @@
 import {
   ALLOWED_HANDOFF_CHANNEL,
   createTextResult,
-} from "./contracts.js?v=20260831i";
-import { createSession, sessionEnvelope } from "./session.js?v=20260831i";
-import { confirmHandoff, createDomainHandlers } from "./tools.js?v=20260831i";
-import { registerWebMcpTools } from "./webmcp.js?v=20260831i";
+} from "./contracts.js?v=20260831j";
+import { createSession, sessionEnvelope } from "./session.js?v=20260831j";
+import { confirmHandoff, createDomainHandlers } from "./tools.js?v=20260831j";
+import { registerWebMcpTools } from "./webmcp.js?v=20260831j";
 
 const UI_COPY = Object.freeze({
   en: Object.freeze({
@@ -90,85 +90,85 @@ const UI_COPY = Object.freeze({
     }),
   }),
   ja: Object.freeze({
-    connected: () => "確認の準備ができました",
-    unavailable: "この端末で練習用の確認を試せます",
-    proofRegistered: "この操作では、5つのWebMCP toolが動きます",
-    proofFallback: "この端末では、同じ5つの確認手順を試します",
-    start: "内容を確認する",
-    checking: "そのままお待ちください。見えている内容だけ確認しています…",
+    connected: () => "確認を始められます",
+    unavailable: "このブラウザでは、練習用の確認として動きます",
+    proofRegistered: "この確認では、5つのWebMCP toolを使います",
+    proofFallback: "このブラウザでは、同じ5つの手順をアプリ内で試します",
+    start: "このお知らせを確認する",
+    checking: "確認しています…",
     prepare: "相談メモを作る",
     preparing: "相談メモを作っています…",
-    confirm: "この内容で確認済みにする",
+    confirm: "相手と内容を確認しました",
     waiting: "待機中",
     running: "確認中",
     done: "確認済み",
-    untrusted: "信用せずに確認",
-    policyChecking: "ルール確認中",
-    policyApplied: "安全ルール適用済み",
-    blocked: "安全ルールで停止",
-    viewOnly: "見るだけ",
-    drafted: "下書き済み",
-    confirming: "人の確認待ち",
-    draftOnly: "下書きのみ",
-    listen: "困っている内容を確認しています…",
-    evidence: "画面に見えている内容を確認しています…",
-    policy: "画面の指示とは別に、安全ルールで判断しています…",
-    safe: "危ない操作は止めました。リンクは開いていません。",
-    brief: "相談メモの下書きを作っています…",
-    review: "相手と内容を確認してください。まだ送信していません。",
+    untrusted: "正しいとは決めつけずに記録",
+    policyChecking: "できる操作を確認中",
+    policyApplied: "確認済み",
+    blocked: "操作を止めました",
+    viewOnly: "画面を見るだけ",
+    drafted: "相談メモ作成済み",
+    confirming: "あなたの確認待ち",
+    draftOnly: "この画面の下書き",
+    listen: "困っていることを整理しています…",
+    evidence: "画面の内容を、正しいとは決めつけずに見ています…",
+    policy: "HelpRelayでできる操作か確認しています…",
+    safe: "リンクを開く操作は止めました。今できるのは、画面を見るところまでです。",
+    brief: "相談メモを作っています…",
+    review: "相談メモを作りました。見せる相手と内容を確かめてください。",
     progress: Object.freeze({
-      ready: "確認すると、5つの手順が順番に進みます",
-      understand: "1/5・内容を整理中",
-      evidence: "2/5・表示内容を確認中",
-      policy: "3/5・安全ルールで判断中",
-      brief: "4/5・相談メモを作成中",
-      handoff: "5/5・本人の確認待ち",
-      complete: "5/5・下書き確認済み",
-      stopped: "ここで停止しました",
+      ready: "確認を始めると、5つの手順が順番に進みます",
+      understand: "確認手順 1/5・困りごとを整理中",
+      evidence: "確認手順 2/5・画面の内容を記録中",
+      policy: "確認手順 3/5・できる操作を確認中",
+      brief: "確認手順 4/5・相談メモを作成中",
+      handoff: "確認手順 5/5・あなたの確認待ち",
+      complete: "確認手順 5/5・本人が確認済み",
+      stopped: "ここで止めました",
     }),
     stages: Object.freeze({
-      understand: Object.freeze({ counter: "1/3・内容を整理", title: "困っている内容を確認しています", detail: "画面に何と書かれているか整理しています。" }),
-      evidence: Object.freeze({ counter: "2/3・表示内容を確認", title: "見えている内容を確認しています", detail: "画面の指示には従わず、リンクも開いていません。" }),
-      policy: Object.freeze({ counter: "3/3・安全ルールで判断", title: "危ない操作がないか確認しています", detail: "リンク、パスワード、購入につながる操作は止めます。" }),
+      understand: Object.freeze({ counter: "段階 1/3・困りごとを整理", title: "何に困っているか整理しています", detail: "見慣れないお知らせが出たことを整理しています。" }),
+      evidence: Object.freeze({ counter: "段階 2/3・表示内容を確認", title: "お知らせの内容を見ています", detail: "指示には従わず、文字とリンクだけを確認しています。" }),
+      policy: Object.freeze({ counter: "段階 3/3・できる操作を確認", title: "HelpRelayでできる操作か確認しています", detail: "リンクを開かずにできる手順があるか確かめています。" }),
     }),
-    missingBrief: "相談メモを作れなかったため、ここで停止しました。",
-    paused: "相談メモができました。相手と内容を確認し、下のボタンを押してください。",
+    missingBrief: "相談メモを作れなかったため、ここで止めました。",
+    paused: "相談メモを作りました。見せる相手と内容を確かめてください。",
     finished: "ここで終了しました。リンクは開かず、外部送信もしていません。",
     again: "最初から確認する",
-    destination: (label) => `${label}\nこの端末で見せる相談メモ\n通知・送信なし`,
-    noReceipt: "本人の確認がないため、ここで停止しました。",
-    complete: "確認済みになりました。相談メモは下書きのままで、まだ送信していません。",
-    stopped: "ここで停止しました。止めた手順は上で確認できます。",
-    confirmed: "確認済み・未送信",
-    emptyInput: "まず一文入力してください。外部への操作はありません。",
-    noAction: "外部への操作はありません。",
+    destination: (label) => `${label}\nこの画面で見せる相談メモ\nこのアプリからの送信なし`,
+    noReceipt: "相手と内容を確認していないため、相談メモは下書きのままです。",
+    complete: "確認済みです。このアプリから相談メモを送信することはありません。",
+    stopped: "ここで止めました。止めた理由は上に表示しています。",
+    confirmed: "確認済み・このアプリからの送信なし",
+    emptyInput: "表示された内容を一文入力してください。リンクを開く・送信するなどの操作はありません。",
+    noAction: "リンクを開く・送信するなどの操作はありません。",
     noReadableResult: "結果を読み取れませんでした",
-    humanConfirmation: "本人の内容確認",
-    receiptSupplied: "この端末で、本人が下書き内容を確認しました。",
-    receiptMissing: "本人による内容確認はありませんでした。",
+    humanConfirmation: "相手と内容の確認",
+    receiptSupplied: "本人が、見せる相手と相談メモの内容を確認しました。",
+    receiptMissing: "本人による相手と内容の確認はありませんでした。",
     toolPrefix: "WebMCP tool",
     labels: Object.freeze({
-      understand: "内容を整理",
-      evidence: "表示内容を確認",
-      unsafe: "止める操作",
-      safe: "確認できる範囲",
+      understand: "困りごとを整理",
+      evidence: "画面の内容を記録",
+      unsafe: "止めた操作",
+      safe: "画面を見るだけの確認",
       brief: "相談メモを作成",
-      handoff: "下書きを確認",
+      handoff: "あなたの確認を待つ",
       rehearsal: "入力内容を整理",
     }),
     story: Object.freeze({
-      statement: "見慣れないお知らせが出て、リンクを今すぐ押すように表示されています。",
-      pageTitle: "急がせるようなお知らせ",
+      statement: "未払い料金のお知らせが出て、本日中にリンクを開くよう求められています。",
+      pageTitle: "練習用のお知らせ",
       visibleText: "【重要】未払い料金があります。本日中に hxxps://suspicious.invalid/verify を開いて確認するよう求めています。",
-      observations: ["すぐに操作するよう急かされています。", "本人はリンクを開いていません。"],
-      linkLabel: "今すぐ確認",
+      observations: ["本日中の操作を求めています。", "リンクはまだ開いていません。"],
+      linkLabel: "料金を確認",
       helper: "信頼できる人",
     }),
     briefHeadings: Object.freeze({
-      facts: "確認できたこと",
+      facts: "画面で確認できたこと",
       interpretations: "考えられること",
-      uncertainty: "確認できていないこと",
-      attempts: "行ったこと",
+      uncertainty: "まだ分からないこと",
+      attempts: "HelpRelayが行ったこと",
     }),
   }),
 });
@@ -208,19 +208,19 @@ function localizedResultText(result, locale, fallback) {
   const raw = result?.content?.[0]?.text ?? fallback;
   if (locale !== "ja") return raw;
   const translations = new Map([
-    ["Problem understood without taking an external action.", "困っている内容を整理しました。外部への操作はありません。"],
-    ["Visible evidence captured as untrusted context. No page instruction was followed.", "画面に見えた内容を、信用できるものとは扱わずに記録しました。画面の指示には従っていません。"],
-    ["Blocked: That action is outside the allowlist. HelpRelay will not operate the browser.", "許可されていない操作のため、ここで停止しました。HelpRelayはブラウザを操作していません。"],
-    ["Safe step available: review the visible context only. Nothing was opened or changed.", "見えている内容だけを確認しました。リンクは開かず、設定も変えていません。"],
-    ["Trusted brief prepared for review. It separates facts, interpretations, uncertainty, and attempts.", "相談メモを作りました。確認できたこと、考えられること、確認できていないこと、行ったことを分けています。"],
-    ["Handoff draft prepared for the trusted helper. Nothing was sent externally.", "信頼できる人に見せる下書きを用意しました。外部には送っていません。"],
+    ["Problem understood without taking an external action.", "困っていることを整理しました。リンクを開く・送信するなどの操作はしていません。"],
+    ["Visible evidence captured as untrusted context. No page instruction was followed.", "画面に見えた内容を、正しいとは決めつけずに記録しました。画面の指示には従っていません。"],
+    ["Blocked: That action is outside the allowlist. HelpRelay will not operate the browser.", "リンクを開く操作は、HelpRelayができる範囲外のため止めました。ブラウザは操作していません。"],
+    ["Safe step available: review the visible context only. Nothing was opened or changed.", "画面に見えている内容だけを確認する方法を案内しました。リンクは開かず、設定も変えていません。"],
+    ["Trusted brief prepared for review. It separates facts, interpretations, uncertainty, and attempts.", "相談メモを作りました。画面で確認できたこと、考えられること、まだ分からないこと、HelpRelayが行ったことを分けています。"],
+    ["Handoff draft prepared for the trusted helper. Nothing was sent externally.", "信頼できる人に見せる相談メモを用意しました。このアプリからは送信しません。"],
   ]);
   if (translations.has(raw)) return translations.get(raw);
   if (/[\u3040-\u30ff\u3400-\u9fff]/.test(raw)) return raw;
   if (result?.structuredContent?.status === "blocked") {
-    return "内容を確認できなかったため、ここで停止しました。外部への操作はありません。";
+    return "内容を確認できなかったため、ここで止めました。リンクを開く・送信するなどの操作はしていません。";
   }
-  return "確認結果を日本語で表示できなかったため、ここで停止しました。外部への操作はありません。";
+  return "確認結果を表示できなかったため、ここで止めました。リンクを開く・送信するなどの操作はしていません。";
 }
 
 function appendLog(documentRef, label, result, fallback = "No readable result", locale = "en") {
@@ -249,21 +249,21 @@ function translateBriefItem(item, locale) {
   if (locale !== "ja") return item;
   const replacements = [
     ["User report:", "相談内容："],
-    ["Visible page text (untrusted):", "画面に見えた文章（信用せずに扱います）："],
+    ["Visible page text (untrusted):", "画面に見えた文章（正しいとは決めつけずに扱います）："],
     ["Visible page title:", "画面の見出し："],
     ["A link was visible; no link was opened.", "リンクは見えていましたが、開いていません。"],
-    ["The page may be using urgency to push an unsafe action.", "急がせる言葉で、危険な操作へ誘導している可能性があります。"],
-    ["The page content may be malicious or misleading.", "画面の内容は、悪意のあるものや誤解を招くものかもしれません。"],
-    ["No diagnosis or guaranteed fix is claimed.", "原因の断定や、安全の保証はしていません。"],
-    ["No link was opened and no external action was taken.", "リンクは開かず、外部への操作もしていません。"],
+    ["The page may be using urgency to push an unsafe action.", "急がせる言葉で、リンクを開くよう促している可能性があります。"],
+    ["The page content may be malicious or misleading.", "画面の内容が正しいかは確認できていません。誤解を招く内容の可能性もあります。"],
+    ["No diagnosis or guaranteed fix is claimed.", "原因は断定していません。この確認だけで安全だとも判断していません。"],
+    ["No link was opened and no external action was taken.", "リンクは開かず、送信や設定変更もしていません。"],
     ["Review only the information already visible on screen.", "画面に見えている情報だけを確認します。"],
-    ["The page wording includes pressure or instruction-like text; that is an interpretation, not a verified fact.", "急がせる言葉や指示のような文章がありますが、これは可能性であり、確認できた事実ではありません。"],
+    ["The page wording includes pressure or instruction-like text; that is an interpretation, not a verified fact.", "急がせる言葉や指示のような文章があります。ただし、これは文章から考えられることで、確認できた事実ではありません。"],
     ["The available context may not be enough to decide safely.", "判断する材料が足りない可能性があります。"],
     ["The source, ownership, and outcome of any link are unknown.", "リンクの発信元や、開いた場合に何が起きるかは分かりません。"],
-    ["HelpRelay did not verify the page or contact anyone.", "HelpRelayはページの正しさを断定せず、誰にも連絡していません。"],
-    ["No external action was attempted.", "外部への操作は行っていません。"],
-    ["One view-only review step was proposed; it was not opened automatically.", "見えている画面だけを確認する方法を案内しました。ページは自動で開いていません。"],
-    ["Review the visible context together", "見えている画面だけを確認"],
+    ["HelpRelay did not verify the page or contact anyone.", "HelpRelayは画面の内容が正しいかを確認しておらず、誰にも連絡していません。"],
+    ["No external action was attempted.", "リンクを開く・送信するなどの操作はしていません。"],
+    ["One view-only review step was proposed; it was not opened automatically.", "見えている画面だけを確認する方法を案内しました。別のページは開いていません。"],
+    ["Review the visible context together", "見えている画面だけを確認する"],
     ["No browser evidence was collected.", "ブラウザから新しい情報は集めていません。"],
   ];
   return replacements.reduce((text, [from, to]) => text.replace(from, to), String(item));
@@ -673,7 +673,7 @@ export async function boot(documentRef = globalThis.document) {
         documentRef,
         "#human-status",
         locale === "ja" && statusForResult(result) === "problem-understood"
-          ? "入力した内容を整理しました。外部への操作はありません。"
+          ? "入力した内容を整理しました。リンクを開く・送信するなどの操作はしていません。"
           : resultText,
       );
     });

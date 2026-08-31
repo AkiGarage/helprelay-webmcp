@@ -34,15 +34,15 @@ Removed or moved behind disclosures:
 
 Replaced with:
 
-- `このお知らせ、先に確認します。`
-- `まず、この画面だけ見れば十分です。`
-- `次は、下の青いボタンを押してください`
-- `内容を確認する`
-- `困っている内容を確認しています`
-- `危ない操作は止めました。リンクは開いていません。`
-- a separate `相談メモを作る` decision and a later `この内容で確認済みにする` decision
+- `このお知らせにどう対応すればよいか確認します。`
+- `リンクは開かず、画面に見えている内容から、今してよいことを確かめます。`
+- `青いボタンを押すと、確認が始まります`
+- `このお知らせを確認する`
+- `HelpRelayでできる操作か確認しています`
+- `このリンクは開かないでください`
+- a separate `相談メモを作る` decision and a later `相手と内容を確認しました` decision
 
-The Japanese copy avoids guessing the person's feelings or repeatedly announcing reassurance. It uses concrete next actions and explicit no-action statements instead.
+The Japanese copy avoids guessing the person's feelings or repeatedly announcing reassurance. It explains the app's actual job: it does not classify a notice as safe or dangerous, but it does stop disallowed actions, identifies the bounded view-only response, and keeps a trusted-person brief local. Every state names its current job, and every button names the state change it causes. Non-sending copy now says the app never sends, rather than implying that confirmation may later trigger delivery.
 
 ## Intentional deviations
 
@@ -59,7 +59,7 @@ The Japanese copy avoids guessing the person's feelings or repeatedly announcing
 - 390×844: active work automatically moves into view; safe result and handoff preview remain in the same column; no horizontal overflow.
 - 390×844: `scrollWidth === innerWidth`; the 61 px mobile primary action stays visible at the bottom of the first screen, then yields to the guided flow after activation.
 - Reduced motion: browser-emulated `prefers-reduced-motion: reduce` matched; active animations were removed, button transitions were effectively disabled, and `scroll-behavior: auto`.
-- WebMCP: the browser reported all five page-defined tools from the local page. The exercised UI path called the real registered executor, stopped at progress 3 before brief creation, paused before `request_handoff`, and recorded `外部には送っていません` only after the separate human confirmation.
+- WebMCP: the browser reported all five page-defined tools from the local page. The exercised UI path called the real registered executor, stopped at progress 3 before brief creation, paused before `request_handoff`, and continued to state `このアプリからは送信しません` after the separate human confirmation.
 - Regression checks: `npm test` passed 30/30 executable tests, including visible-evidence matching, stale async-result isolation, always-visible empathy/safety copy, the help-link tool disclosure, and distinct real-WebMCP/local-practice wording; `npm run check` passed all required-file and module checks.
 
 ## Agency signoff
